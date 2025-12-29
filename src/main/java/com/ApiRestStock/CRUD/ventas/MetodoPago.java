@@ -1,4 +1,5 @@
-package com.ApiRestStock.CRUD.Enums;
+package com.ApiRestStock.CRUD.ventas;
+
 
 public enum MetodoPago {
     EFECTIVO,

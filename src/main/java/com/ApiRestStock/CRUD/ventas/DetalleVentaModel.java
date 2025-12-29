@@ -1,6 +1,8 @@
-package com.ApiRestStock.CRUD.Models;
+package com.ApiRestStock.CRUD.ventas;
 
 import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,27 +17,21 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-    name = "detalle_compra",
+    name = "detalle_venta",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_detalle_compra_compra_producto",
-            columnNames = {"compra_id", "producto_id"}
+            name = "uk_detalle_venta_venta_producto",
+            columnNames = {"venta_id", "nombre_producto"}
         )
     }
 )
-public class DetalleCompraModel {
+public class DetalleVentaModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "detalle_compra_id")
+    @Column(name = "detalle_venta_id")
     private Long id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "compra_id", nullable = false)
-    private CompraModel compra;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id", nullable = false)
-    private ProductModel producto;
 
     @Column(nullable = false)
     private Integer cantidad;
@@ -43,27 +39,27 @@ public class DetalleCompraModel {
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 
-    // --- getters/setters ---
+    @Column(name = "nombre_producto", nullable = false, length = 255)
+    private String nombreProducto;
+
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "venta_id", nullable = false)
+    private VentaModel venta;
 
     public Long getId() {
         return id;
     }
 
-    public CompraModel getCompra() {
-        return compra;
-    }
 
-    public void setCompra(CompraModel compra) {
-        this.compra = compra;
+    public VentaModel getVenta() {
+        return venta;
     }
-
-    public ProductModel getProducto() {
-        return producto;
+    
+    public void setVenta(VentaModel venta) {
+        this.venta = venta;
     }
-
-    public void setProducto(ProductModel producto) {
-        this.producto = producto;
-    }
+    
 
     public Integer getCantidad() {
         return cantidad;
@@ -77,7 +73,17 @@ public class DetalleCompraModel {
         return precioUnitario;
     }
 
-    public void setPrecioUnitario(BigDecimal precioUnitario) {
+    public void setPrecioUnitario( BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
     }
+
+    public String getNombreProducto() {
+        return nombreProducto;
+    }
+
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
+    }
+
 }
+

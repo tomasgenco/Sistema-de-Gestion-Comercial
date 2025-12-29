@@ -1,4 +1,4 @@
-package com.ApiRestStock.CRUD.Repositories;
+package com.ApiRestStock.CRUD.ventas;
 
 import java.util.List;
 
@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.ApiRestStock.CRUD.Enums.EstadoFiado;
-import com.ApiRestStock.CRUD.Models.FiadoModel;
 
 @Repository
 public interface FiadoRepository extends JpaRepository<FiadoModel, Long> {

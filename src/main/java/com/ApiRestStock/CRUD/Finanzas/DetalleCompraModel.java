@@ -1,6 +1,8 @@
-package com.ApiRestStock.CRUD.Models;
+package com.ApiRestStock.CRUD.Finanzas;
 
 import java.math.BigDecimal;
+
+import com.ApiRestStock.CRUD.stock.ProductModel;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,23 +17,23 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(
-    name = "detalle_venta",
+    name = "detalle_compra",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_detalle_venta_venta_producto",
-            columnNames = {"venta_id", "producto_id"}
+            name = "uk_detalle_compra_compra_producto",
+            columnNames = {"compra_id", "producto_id"}
         )
     }
 )
-public class DetalleVentaModel {
+public class DetalleCompraModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "detalle_venta_id")
+    @Column(name = "detalle_compra_id")
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "venta_id", nullable = false)
-    private VentaModel venta;
+    @JoinColumn(name = "compra_id", nullable = false)
+    private CompraModel compra;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id", nullable = false)
@@ -43,20 +45,26 @@ public class DetalleVentaModel {
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 
+    // --- getters/setters ---
+
     public Long getId() {
         return id;
     }
 
-    public VentaModel getVenta() {
-        return venta;
+    public CompraModel getCompra() {
+        return compra;
     }
 
-    public void setVenta(VentaModel venta) {
-        this.venta = venta;
+    public void setCompra(CompraModel compra) {
+        this.compra = compra;
     }
 
     public ProductModel getProducto() {
         return producto;
+    }
+
+    public void setProducto(ProductModel producto) {
+        this.producto = producto;
     }
 
     public Integer getCantidad() {
@@ -71,5 +79,7 @@ public class DetalleVentaModel {
         return precioUnitario;
     }
 
+    public void setPrecioUnitario(BigDecimal precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
 }
-

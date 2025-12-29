@@ -1,31 +1,34 @@
-package com.ApiRestStock.CRUD.Models;
+package com.ApiRestStock.CRUD.Finanzas;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ApiRestStock.CRUD.Enums.MetodoPago;
+import com.ApiRestStock.CRUD.proveedor.ProveedorModel;
+import com.ApiRestStock.CRUD.ventas.MetodoPago;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-
 @Entity
-@Table(name = "venta")
-public class VentaModel {
+@Table(name = "compra")
+public class CompraModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "venta_id")
+    @Column(name = "compra_id")
     private Long id;
 
     @Column(name = "fecha_hora", nullable = false)
@@ -38,19 +41,17 @@ public class VentaModel {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-    /* 
-       Relación con detalle_venta
-       Una venta tiene muchos detalles
-    */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "proveedor_id", nullable = false)
+    private ProveedorModel proveedor;
+
     @OneToMany(
-        mappedBy = "venta",
+        mappedBy = "compra",
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
 
-    private List<DetalleVentaModel> detalles = new ArrayList<>();
-
-    // --- getters/setters ---
+    private List<DetalleCompraModel> detalles = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -80,14 +81,17 @@ public class VentaModel {
         this.total = total;
     }
 
-    public List<DetalleVentaModel> getDetalles() {
+    public ProveedorModel getProveedor() {
+        return proveedor;
+    }
+
+    public void setProveedor(ProveedorModel proveedor) {
+        this.proveedor = proveedor;
+    }
+
+    public List<DetalleCompraModel> getDetalles() {
         return detalles;
     }
 
-    public boolean agregarDetalle(DetalleVentaModel detalle) {
-        this.detalles.add(detalle);
-        detalle.setVenta(this);
-        return true;
-    }
+    
 }
-

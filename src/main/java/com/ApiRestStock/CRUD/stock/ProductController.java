@@ -1,4 +1,4 @@
-package com.ApiRestStock.CRUD.Controllers;
+package com.ApiRestStock.CRUD.stock;
 
 import java.util.List;
 
@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ApiRestStock.CRUD.Models.ProductModel;
-import com.ApiRestStock.CRUD.Services.ProductService;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/producto")
@@ -34,12 +32,27 @@ public class ProductController {
     public ProductModel getProductoById(@PathVariable("id") Long id){
         return this.productService.getProductById(id);
     }
+    
+    @GetMapping("/sku/{sku}")
+    public ProductModel getProductBySku(@PathVariable String sku) {
+
+        try {
+            return productService.getProductBySku(sku);
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Producto no encontrado con SKU: " + sku
+            );
+        }
+}
+
+
 
 
     @PostMapping
     public ResponseEntity<ProductModel> saveProduct(@RequestBody ProductModel producto){
         ProductModel savedProduct = this.productService.saveProduct(producto);
-
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 
@@ -57,10 +70,6 @@ public class ProductController {
         return ResponseEntity.notFound().build(); // 404
     }
 
-    @GetMapping("/{sku}")
-    public ProductModel getProductBySku(@PathVariable String sku) {
-        return this.productService.getProductBySku(sku);
-    }
     
 
     

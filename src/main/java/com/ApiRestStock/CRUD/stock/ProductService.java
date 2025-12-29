@@ -1,13 +1,8 @@
-package com.ApiRestStock.CRUD.Services;
-
-import java.util.ArrayList;
+package com.ApiRestStock.CRUD.stock;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.ApiRestStock.CRUD.Models.ProductModel;
-import com.ApiRestStock.CRUD.Repositories.IProductRepository;
 
 @Service
 public class ProductService {
@@ -29,10 +24,16 @@ public class ProductService {
     }
 
     public ProductModel getProductBySku(String sku){
-        return productRepository.findBySku(sku)
-        .orElseThrow(() -> new RuntimeException("No se encontro el producto con el Sku: " + sku));
+        ProductModel product = productRepository.findBySku(sku).get();
+
+        if (product == null) {
+            throw new RuntimeException("No se encontro el producto con el SKU: " + sku);
+        } else{
+            return product;
+        }
     }
 
+    //Pensar bien pasa con lo que no se quiere actualizar del producto
     public ProductModel updateById(ProductModel producto, Long id){
         ProductModel findProduct = this.productRepository.findById(id).get();
 

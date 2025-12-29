@@ -1,4 +1,4 @@
-package com.ApiRestStock.CRUD.Models;
+package com.ApiRestStock.CRUD.proveedor;
 
 import java.time.OffsetDateTime;
 

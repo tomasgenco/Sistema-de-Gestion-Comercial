@@ -1,56 +1,57 @@
-package com.ApiRestStock.CRUD.Models;
+package com.ApiRestStock.CRUD.ventas;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ApiRestStock.CRUD.Enums.MetodoPago;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+
 @Entity
-@Table(name = "compra")
-public class CompraModel {
+@Table(name = "venta")
+public class VentaModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "compra_id")
+    @Column(name = "venta_id")
     private Long id;
 
     @Column(name = "fecha_hora", nullable = false)
     private OffsetDateTime fechaHora;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "metodo_pago", nullable = false)
+    @Column(name = "metodo_pago", nullable = true)
     private MetodoPago metodoPago;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "proveedor_id", nullable = false)
-    private ProveedorModel proveedor;
-
+    /* 
+       Relación con detalle_venta
+       Una venta tiene muchos detalles
+    */
+    @JsonManagedReference
     @OneToMany(
-        mappedBy = "compra",
+        mappedBy = "venta",
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
 
-    private List<DetalleCompraModel> detalles = new ArrayList<>();
+    private List<DetalleVentaModel> detalles = new ArrayList<>();
+
+    // --- getters/setters ---
 
     public Long getId() {
         return id;
@@ -80,17 +81,18 @@ public class CompraModel {
         this.total = total;
     }
 
-    public ProveedorModel getProveedor() {
-        return proveedor;
-    }
-
-    public void setProveedor(ProveedorModel proveedor) {
-        this.proveedor = proveedor;
-    }
-
-    public List<DetalleCompraModel> getDetalles() {
+    public List<DetalleVentaModel> getDetalles() {
         return detalles;
     }
 
-    
+    public void setDetalles(List<DetalleVentaModel> detalles) {
+        this.detalles = detalles;
+    }
+
+
+    public boolean agregarDetalle(DetalleVentaModel detalle) {
+        this.detalles.add(detalle);
+        return true;
+    }
 }
+

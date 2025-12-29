@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.ApiRestStock.CRUD.Models.ProveedorModel;
+import com.ApiRestStock.CRUD.proveedor.ProveedorModel;
 
 @Repository
 public interface ProveedorRepository extends JpaRepository<ProveedorModel, Long> {

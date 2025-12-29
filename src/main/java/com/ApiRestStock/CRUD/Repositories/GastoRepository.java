@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.ApiRestStock.CRUD.Enums.TipoGasto;
-import com.ApiRestStock.CRUD.Models.GastoModel;
+import com.ApiRestStock.CRUD.Finanzas.GastoModel;
 
 @Repository
 public interface GastoRepository extends JpaRepository<GastoModel, Long> {

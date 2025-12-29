@@ -1,10 +1,10 @@
-package com.ApiRestStock.CRUD.Services;
+package com.ApiRestStock.CRUD.shared.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ApiRestStock.CRUD.Models.UsuarioModel;
 import com.ApiRestStock.CRUD.Repositories.UsuarioRepository;
+import com.ApiRestStock.CRUD.shared.model.UsuarioModel;
 
 @Service
 public class UsuarioService {
