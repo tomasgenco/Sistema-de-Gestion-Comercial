@@ -24,9 +24,6 @@ public class ProveedorModel {
     @Column(name = "proveedor_id")
     private Long id;
 
-    @Column(nullable = false)
-    private OffsetDateTime fecha;
-
     @Column(length = 20, unique = true)
     private String cuit;
 
@@ -42,13 +39,7 @@ public class ProveedorModel {
         return id;
     }
 
-    public OffsetDateTime getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(OffsetDateTime fecha) {
-        this.fecha = fecha;
-    }
+    
 
     public String getCuit() {
         return cuit;

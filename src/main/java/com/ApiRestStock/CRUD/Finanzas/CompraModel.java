@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ApiRestStock.CRUD.proveedor.ProveedorModel;
-import com.ApiRestStock.CRUD.ventas.MetodoPago;
+import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -45,6 +46,7 @@ public class CompraModel {
     @JoinColumn(name = "proveedor_id", nullable = false)
     private ProveedorModel proveedor;
 
+    @JsonManagedReference
     @OneToMany(
         mappedBy = "compra",
         cascade = CascadeType.ALL,
@@ -92,6 +94,7 @@ public class CompraModel {
     public List<DetalleCompraModel> getDetalles() {
         return detalles;
     }
+
 
     
 }

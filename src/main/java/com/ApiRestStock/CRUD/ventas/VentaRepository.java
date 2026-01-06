@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
+
 @Repository
 public interface VentaRepository extends JpaRepository<VentaModel, Long> {
 

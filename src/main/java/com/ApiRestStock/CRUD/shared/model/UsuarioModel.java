@@ -60,4 +60,8 @@ public class UsuarioModel {
     public boolean getActivo() {
         return activo;
     }
+
+    public OffsetDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
 }

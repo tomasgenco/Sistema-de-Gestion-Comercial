@@ -4,14 +4,15 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ApiRestStock.CRUD.stock.IProductRepository;
-import com.ApiRestStock.CRUD.stock.ProductModel;
+import com.ApiRestStock.CRUD.Finanzas.enums.TipoIngreso;
+import com.ApiRestStock.CRUD.Finanzas.ingreso.IngresoService;
+import com.ApiRestStock.CRUD.stock.ProductService;
 import com.ApiRestStock.CRUD.ventas.DTOs.ItemVentaRequest;
+import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 
 import jakarta.transaction.Transactional;
 
@@ -22,7 +23,10 @@ public class VentaService {
     VentaRepository ventaRepository;
 
     @Autowired
-    IProductRepository productRepository;
+    ProductService productService;
+
+    @Autowired
+    IngresoService ingresoService;
     
 
     public BigDecimal calcularTotal(VentaModel venta) {
@@ -60,19 +64,18 @@ public VentaModel registrarVenta(List<ItemVentaRequest> items, MetodoPago metodo
         detalles.add(detalle);
         
         
-        // Actualizar el stock del producto
-        Optional<ProductModel> prod = productRepository.findByNombre(item.nombreProducto());
-        prod.ifPresent(product -> {
-            product.setStock(product.getStock() - item.cantidad());
-            productRepository.save(product);
-        });
+        //Actualiza el stock del producto vendido
+        productService.actualizarStockPorNombre(item.nombreProducto(), item.cantidad(), "restar");
 
 
     }
 
     venta.setDetalles(detalles);
-    calcularTotal(venta);
-
+    BigDecimal total = calcularTotal(venta);
+    
+    // Registra la venta como un ingreso en el sistema financiero
+    ingresoService.registrarIngreso(total, TipoIngreso.VENTA, venta, null);
+    
     return ventaRepository.save(venta);
 }
 

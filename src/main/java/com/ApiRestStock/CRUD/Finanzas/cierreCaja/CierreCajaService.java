@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ApiRestStock.CRUD.Finanzas.DTOs.CierreCajaResponse;
 import com.ApiRestStock.CRUD.Finanzas.exception.CierreCajaDuplicadoException;
-import com.ApiRestStock.CRUD.ventas.MetodoPago;
 import com.ApiRestStock.CRUD.ventas.VentaRepository;
+import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 
 @Service
 public class CierreCajaService {

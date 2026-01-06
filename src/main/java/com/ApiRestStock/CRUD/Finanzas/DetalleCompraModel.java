@@ -3,6 +3,7 @@ package com.ApiRestStock.CRUD.Finanzas;
 import java.math.BigDecimal;
 
 import com.ApiRestStock.CRUD.stock.ProductModel;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,6 +32,7 @@ public class DetalleCompraModel {
     @Column(name = "detalle_compra_id")
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "compra_id", nullable = false)
     private CompraModel compra;
@@ -44,6 +46,10 @@ public class DetalleCompraModel {
 
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
+
+    // SNAPSHOT
+    @Column(name = "nombre_producto", nullable = false, length = 255)
+    private String nombreProducto;
 
     // --- getters/setters ---
 
@@ -81,5 +87,13 @@ public class DetalleCompraModel {
 
     public void setPrecioUnitario(BigDecimal precioUnitario) {
         this.precioUnitario = precioUnitario;
+    }
+
+    public String getNombreProducto() {
+        return nombreProducto;
+    }
+
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
     }
 }

@@ -3,7 +3,7 @@ package com.ApiRestStock.CRUD.Finanzas.cierreCaja;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.ApiRestStock.CRUD.ventas.MetodoPago;
+import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
