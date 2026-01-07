@@ -1,4 +1,4 @@
-package com.ApiRestStock.CRUD.Finanzas;
+package com.ApiRestStock.CRUD.Finanzas.Compra;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ApiRestStock.CRUD.Finanzas.Compra.DTOs.CompraResponse;
+import com.ApiRestStock.CRUD.Finanzas.Compra.DTOs.DetalleCompraResponse;
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoGasto;
 import com.ApiRestStock.CRUD.Finanzas.exception.ProductosFaltantesException;
 import com.ApiRestStock.CRUD.Finanzas.gasto.GastoService;
@@ -17,6 +19,8 @@ import com.ApiRestStock.CRUD.proveedor.ProveedorService;
 import com.ApiRestStock.CRUD.stock.ProductModel;
 import com.ApiRestStock.CRUD.stock.ProductService;
 import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
+import com.ApiRestStock.CRUD.Finanzas.exception.NoFoundComprasProveedorException;
+
 
 
 @Service
@@ -147,4 +151,31 @@ public class CompraService {
         return compraRepository.save(compraModel);
     }
 
+    public List<CompraResponse> getComprasPorProveedor(String nombreProveedor) {
+
+        List<CompraModel> compras = compraRepository.findByProveedorNombre(nombreProveedor);
+
+        if (compras.isEmpty()) {
+            throw new NoFoundComprasProveedorException(nombreProveedor);
+        }
+
+        return compras.stream()
+                .map(compra -> new CompraResponse(
+                        compra.getId(),
+                        compra.getFechaHora(),
+                        compra.getMetodoPago().name(),
+                        compra.getProveedor().getNombre(),
+                        compra.getTotal(),
+                        compra.getDetalles().stream()
+                                .map(det -> new DetalleCompraResponse(
+                                        det.getId(),
+                                        det.getCantidad(),
+                                        det.getPrecioUnitario(),
+                                        det.getNombreProducto(),
+                                        det.getProducto().getId()
+                                ))
+                                .toList()
+                ))
+                .toList();
+    }
 }

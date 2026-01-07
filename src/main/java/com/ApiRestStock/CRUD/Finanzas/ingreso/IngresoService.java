@@ -1,6 +1,7 @@
 package com.ApiRestStock.CRUD.Finanzas.ingreso;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,5 +40,19 @@ public class IngresoService {
 
     public List<IngresoModel> getIngresosByTipo(TipoIngreso tipo) {
         return ingresoRepository.findByTipo(tipo);
+    }
+
+    public double getTotalIngresos() {
+        Double total = ingresoRepository.sumTotalIngresos();
+        return total != null ? total : 0.0;
+    }
+
+    public double getTotalIngresosLastDays(int dias) {
+        OffsetDateTime hasta = OffsetDateTime.now();
+        OffsetDateTime desde = hasta.minusDays(dias);
+        OffsetDateTime desde00 = desde.withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        Double total = ingresoRepository.sumTotalIngresosBetween(desde00, hasta);
+        return total != null ? total : 0.0;
     }
 }

@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.ApiRestStock.CRUD.Finanzas.CompraModel;
+import com.ApiRestStock.CRUD.Finanzas.Compra.CompraModel;
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoGasto;
 
 import jakarta.persistence.Column;

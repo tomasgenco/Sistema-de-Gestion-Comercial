@@ -28,5 +28,15 @@ public class IngresoController {
             return ingresoService.getAllIngresos();
         }
     }
-    
+
+    @GetMapping("/total")
+    public double getTotalIngresos(@RequestParam(name = "dias", required = false) Integer dias) {
+        if (dias == null) {
+            return ingresoService.getTotalIngresos();
+        }
+        // Solo permitimos valores específicos: 7, 14 y 30 (1 mes)
+        return ingresoService.getTotalIngresosLastDays(dias);
+        
+        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El parámetro 'dias' debe ser 7, 14 o 30");
+    }
 }

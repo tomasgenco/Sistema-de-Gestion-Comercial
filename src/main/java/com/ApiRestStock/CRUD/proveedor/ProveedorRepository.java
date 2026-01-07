@@ -1,6 +1,7 @@
 package com.ApiRestStock.CRUD.proveedor;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,7 @@ public interface ProveedorRepository extends JpaRepository<ProveedorModel, Long>
 
     // Verificar si existe un proveedor por nombre
     boolean existsByNombre(String nombre);
+
+    // Listar proveedores activos
+    List<ProveedorModel> findByActivo(Boolean activo);
 }

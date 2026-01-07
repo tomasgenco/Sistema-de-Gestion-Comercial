@@ -1,6 +1,5 @@
 package com.ApiRestStock.CRUD.proveedor;
 
-import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -62,7 +61,7 @@ public class ProveedorModel {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this.nombre = nombre.toLowerCase();
     }
 
 }

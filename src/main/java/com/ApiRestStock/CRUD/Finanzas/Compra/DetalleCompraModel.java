@@ -1,4 +1,4 @@
-package com.ApiRestStock.CRUD.Finanzas;
+package com.ApiRestStock.CRUD.Finanzas.Compra;
 
 import java.math.BigDecimal;
 

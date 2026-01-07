@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ApiRestStock.CRUD.Finanzas.DTOs.GastoRequest;
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoGasto;
 
 @Service
@@ -41,5 +40,19 @@ public class GastoService {
 
     public List<GastoModel> findByTipo(TipoGasto tipo) {
         return gastoRepository.findByTipo(tipo);
+    }
+
+    public double getTotalGastos() {
+        Double total = gastoRepository.sumTotalGastos();
+        return total != null ? total : 0.0;
+    }
+
+    public double getTotalGastosLastDays(int dias) {
+        java.time.OffsetDateTime hasta = java.time.OffsetDateTime.now();
+        java.time.OffsetDateTime desde = hasta.minusDays(dias);
+        java.time.OffsetDateTime desde00 = desde.withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+        Double total = gastoRepository.sumTotalGastosBetween(desde00, hasta);
+        return total != null ? total : 0.0;
     }
 }

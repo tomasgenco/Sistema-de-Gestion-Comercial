@@ -1,4 +1,4 @@
-package com.ApiRestStock.CRUD.Finanzas;
+package com.ApiRestStock.CRUD.Finanzas.Compra;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -53,7 +53,7 @@ public class CompraModel {
         orphanRemoval = true
     )
 
-    private List<DetalleCompraModel> detalles = new ArrayList<>();
+    private final List<DetalleCompraModel>  detalles = new ArrayList<>();
 
     public Long getId() {
         return id;
