@@ -3,16 +3,14 @@ package com.ApiRestStock.CRUD.Finanzas.DTOs;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 public class CerrarCajaRequest {
 
-     /**
+    /**
      * Si es null, se asume hoy (LocalDate.now()) en el Service.
      */
     private LocalDate fecha;
 
-    @NotNull
+    
     @DecimalMin(value = "0.00", inclusive = true)
     private BigDecimal efectivoReal;
 

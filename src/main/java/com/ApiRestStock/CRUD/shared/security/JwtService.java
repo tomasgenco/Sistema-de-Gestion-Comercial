@@ -1,9 +1,7 @@
 package com.ApiRestStock.CRUD.shared.security;
 
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
-import java.time.Instant;
-import java.util.Map;
+import java.util.Date;
 
 import javax.crypto.SecretKey;
 
@@ -20,31 +18,27 @@ public class JwtService {
 
     private final SecretKey key;
     private final long expirationMinutes;
-    private final String issuer;
 
-    public JwtService(
+public JwtService(
             @Value("${security.jwt.secret}") String secret,
-            @Value("${security.jwt.expiration-minutes}") long expirationMinutes,
-            @Value("${security.jwt.issuer}") String issuer
+            @Value("${security.jwt.expiration-minutes:60") long expirationMinutes
     ) {
-        // HS256 requiere una clave suficientemente larga (32+ bytes).
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMinutes = expirationMinutes;
-        this.issuer = issuer;
     }
 
-    public String generateToken(String subject, Map<String, Object> extraClaims) {
-        Instant now = Instant.now();
-        Instant exp = now.plusSeconds(expirationMinutes * 60);
+    public String generateToken(String subjectUserName, String role ) {
+        Date now = new Date();
+        long expirationMs = expirationMinutes * 60 * 1000L;
+        Date exp = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-                .issuer(issuer)
-                .subject(subject)
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(exp))
-                .claims(extraClaims)          // claims custom: rol, etc.
-                .signWith(key)                // HS256 por la key
-                .compact();
+            .subject(subjectUserName)
+            .claim("role", role)   // o "roles" si manejás lista
+            .issuedAt(now)
+            .expiration(exp)
+            .signWith(key)
+            .compact();
     }
 
     public boolean isTokenValid(String token) {
@@ -61,14 +55,14 @@ public class JwtService {
     }
 
     public String extractRole(String token) {
-        Object rol = parseClaims(token).get("rol");
-        return rol != null ? rol.toString() : null;
+        Claims claims = parseClaims(token);
+        return claims.get("role", String.class);
     }
 
-    public Claims parseClaims(String token) {
+
+    private Claims parseClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)
-                .requireIssuer(issuer)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

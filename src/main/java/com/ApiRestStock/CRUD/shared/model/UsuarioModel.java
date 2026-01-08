@@ -2,6 +2,8 @@ package com.ApiRestStock.CRUD.shared.model;
 
 import java.time.OffsetDateTime;
 
+import com.ApiRestStock.CRUD.shared.enums.RolUsuario;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +27,7 @@ public class UsuarioModel {
     private String password; // BCrypt hash
 
     @Column(nullable = false, length = 20)
-    private String rol;
+    private RolUsuario rol;
 
     @Column(nullable = false)
     private Boolean activo = true;
@@ -53,8 +55,12 @@ public class UsuarioModel {
         this.password = password;
     }
 
-    public String getRol() {
+    public RolUsuario getRol() {
         return rol;
+    }
+
+    public void setRol(RolUsuario ru){
+        this.rol = ru;
     }
 
     public boolean getActivo() {
