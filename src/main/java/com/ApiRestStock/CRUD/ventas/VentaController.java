@@ -16,7 +16,7 @@ import com.ApiRestStock.CRUD.ventas.DTOs.VentaRequest;
 
 
 @RestController
-@RequestMapping("/venta")
+@RequestMapping("/ventas")
 public class VentaController {
 
     @Autowired

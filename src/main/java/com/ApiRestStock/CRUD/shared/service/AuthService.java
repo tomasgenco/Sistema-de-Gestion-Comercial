@@ -1,6 +1,8 @@
 package com.ApiRestStock.CRUD.shared.service;
 
 
+import java.time.OffsetDateTime;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,6 +42,7 @@ public class AuthService {
         user.setUsername(userNameNorm);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRol(RolUsuario.VENDEDOR);
+        user.setFechaCreacion(OffsetDateTime.now());
         user = userRepository.save(user);
 
         String token = jwtService.generateToken(userNameNorm, user.getRol().name());

@@ -6,6 +6,8 @@ import com.ApiRestStock.CRUD.shared.enums.RolUsuario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +28,7 @@ public class UsuarioModel {
     @Column(nullable = false)
     private String password; // BCrypt hash
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private RolUsuario rol;
 
@@ -67,7 +70,15 @@ public class UsuarioModel {
         return activo;
     }
 
+    public void setActivo(Boolean state){
+        activo = state;
+    }
+
     public OffsetDateTime getFechaCreacion() {
         return fechaCreacion;
+    }
+
+    public void setFechaCreacion(OffsetDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 }
