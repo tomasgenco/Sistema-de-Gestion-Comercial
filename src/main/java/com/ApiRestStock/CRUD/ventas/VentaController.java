@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ApiRestStock.CRUD.ventas.DTOs.VentaRequest;
+import com.ApiRestStock.CRUD.ventas.DTOs.VentaResponse;
 
 
 
@@ -27,8 +28,18 @@ public class VentaController {
         return this.ventaService.getVentas();
         
     }
-    
 
+    @GetMapping("/mes/cantidad")
+    public ResponseEntity<Long> getCantidadVentasDelMes() {
+        Long cantidad = ventaService.getCantidadVentasDelMes();
+        return ResponseEntity.ok(cantidad);
+    }
+
+    @GetMapping("/ultimas")
+    public ResponseEntity<List<VentaResponse>> getUltimas5Ventas() {
+        List<VentaResponse> ventas = ventaService.getUltimas5Ventas();
+        return ResponseEntity.ok(ventas);
+    }
 
     @PostMapping
     public ResponseEntity<Void> subirVenta(@RequestBody VentaRequest request) {

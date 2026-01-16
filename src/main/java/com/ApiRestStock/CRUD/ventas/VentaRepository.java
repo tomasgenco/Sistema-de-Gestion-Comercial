@@ -48,4 +48,23 @@ public interface VentaRepository extends JpaRepository<VentaModel, Long> {
         @Param("metodoPago") MetodoPago metodoPago
     );
 
+    /**
+     * Cuenta la cantidad de ventas del mes actual.
+     */
+    @Query("""
+        SELECT COUNT(v)
+        FROM VentaModel v
+        WHERE YEAR(v.fechaHora) = :anio
+          AND MONTH(v.fechaHora) = :mes
+    """)
+    Long countVentasDelMes(
+        @Param("anio") int anio,
+        @Param("mes") int mes
+    );
+
+    /**
+     * Obtiene las últimas 5 ventas ordenadas por fecha descendente.
+     */
+    List<VentaModel> findTop5ByOrderByFechaHoraDesc();
+
 }

@@ -37,6 +37,7 @@ public class SecurityConfig {
                 // VENDEDOR + ADMIN: registrar ventas y compras
                 .requestMatchers(HttpMethod.POST, "/ventas/**").hasAnyRole("ADMIN", "VENDEDOR")
                 .requestMatchers(HttpMethod.POST, "/compras/**").hasAnyRole("ADMIN", "VENDEDOR")
+
                 // Si en tu proyecto compras a proveedor se llaman "ingresos":
                 // .requestMatchers(HttpMethod.POST, "/ingresos/**").hasAnyRole("ADMIN", "VENDEDOR")
 

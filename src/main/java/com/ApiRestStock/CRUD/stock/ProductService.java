@@ -145,5 +145,13 @@ public class ProductService {
         return productRepository.save(nuevoProducto);
     }
 
+
+    public Boolean productoEstaBajoStockPorNombre(String nombre){
+        ProductModel prod = productRepository.findByNombre(nombre)
+        .orElseThrow( () -> new RuntimeException("Producto no encontrado"));
+
+        return prod.isBajoStock();
+    }
+
     
 }

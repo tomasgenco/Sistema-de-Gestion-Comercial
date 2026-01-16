@@ -45,9 +45,9 @@ public class AuthService {
         user.setFechaCreacion(OffsetDateTime.now());
         user = userRepository.save(user);
 
-        String token = jwtService.generateToken(userNameNorm, user.getRol().name());
+        String accessToken = jwtService.generateAccessToken(userNameNorm, user.getRol().name());
 
-        return new AuthResponse(token, "Bearer", user.getId(), userNameNorm);
+        return new AuthResponse(accessToken, "Bearer", user.getId(), userNameNorm, user.getRol().name());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -65,8 +65,43 @@ public class AuthService {
         UsuarioModel user = userRepository.findByUsername(userNameNorm)
                 .orElseThrow(() -> new IllegalStateException("Usuario no encontrado tras autenticar."));
 
-        String token = jwtService.generateToken(userNameNorm, user.getRol().name());
+        String accessToken = jwtService.generateAccessToken(userNameNorm, user.getRol().name());
 
-        return new AuthResponse(token, "Bearer", user.getId(), user.getUsername());
+        return new AuthResponse(accessToken, "Bearer", user.getId(), user.getUsername(), user.getRol().name());
     }
+
+    public LoginWithRefreshResult loginWithRefresh(LoginRequest request) {
+        String userNameNorm = request.getUsername().trim().toLowerCase();
+
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                userNameNorm,
+                request.getPassword()
+            )
+        );
+
+        UsuarioModel user = userRepository.findByUsername(userNameNorm)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado tras autenticar."));
+
+        String accessToken = jwtService.generateAccessToken(userNameNorm, user.getRol().name());
+        String refreshToken = jwtService.generateRefreshToken(userNameNorm, user.getRol().name());
+
+        AuthResponse response = new AuthResponse(accessToken, "Bearer", user.getId(), user.getUsername(), user.getRol().name());
+        return new LoginWithRefreshResult(response, refreshToken);
+    }
+
+    public LoginWithRefreshResult refreshAccessToken(String refreshToken) {
+        String username = jwtService.extractSubject(refreshToken);
+
+        UsuarioModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado."));
+
+        String accessToken = jwtService.generateAccessToken(username, user.getRol().name());
+        String newRefreshToken = jwtService.generateRefreshToken(username, user.getRol().name());
+
+        AuthResponse response = new AuthResponse(accessToken, "Bearer", user.getId(), user.getUsername(), user.getRol().name());
+        return new LoginWithRefreshResult(response, newRefreshToken);
+    }
+
+    public record LoginWithRefreshResult(AuthResponse response, String refreshToken) {}
 }

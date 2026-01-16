@@ -12,6 +12,7 @@ import com.ApiRestStock.CRUD.Finanzas.enums.TipoIngreso;
 import com.ApiRestStock.CRUD.Finanzas.ingreso.IngresoService;
 import com.ApiRestStock.CRUD.stock.ProductService;
 import com.ApiRestStock.CRUD.ventas.DTOs.ItemVentaRequest;
+import com.ApiRestStock.CRUD.ventas.DTOs.VentaResponse;
 import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 
 import jakarta.transaction.Transactional;
@@ -43,6 +44,25 @@ public class VentaService {
 
     public List<VentaModel> getVentas() {
         return ventaRepository.findAll();
+    }
+
+    public Long getCantidadVentasDelMes() {
+        OffsetDateTime ahora = OffsetDateTime.now();
+        int anio = ahora.getYear();
+        int mes = ahora.getMonthValue();
+        return ventaRepository.countVentasDelMes(anio, mes);
+    }
+
+    public List<VentaResponse> getUltimas5Ventas() {
+        List<VentaModel> ventas = ventaRepository.findTop5ByOrderByFechaHoraDesc();
+        return ventas.stream()
+                .map(venta -> new VentaResponse(
+                    venta.getId(),
+                    venta.getFechaHora(),
+                    venta.getTotal(),
+                    venta.getMetodoPago()
+                ))
+                .toList();
     }
 
 @Transactional
@@ -78,6 +98,7 @@ public VentaModel registrarVenta(List<ItemVentaRequest> items, MetodoPago metodo
     
     return ventaRepository.save(venta);
 }
+
 
     
 

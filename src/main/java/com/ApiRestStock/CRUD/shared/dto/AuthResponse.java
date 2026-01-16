@@ -4,5 +4,6 @@ public record AuthResponse(
     String accessToken,
     String tokenType,
     Long usuarioId,
-    String username
+    String username,
+    String rol
 ) {}

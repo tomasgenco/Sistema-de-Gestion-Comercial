@@ -70,6 +70,13 @@ public class ProductController {
         return ResponseEntity.notFound().build(); // 404
     }
 
+
+    @GetMapping("{nombre}/bajo-stock")
+    public ResponseEntity<Boolean> estaBajoStock(@PathVariable String nombre) {
+        return ResponseEntity.ok(productService.productoEstaBajoStockPorNombre(nombre));
+    }
+
+
     
 
     
