@@ -4,17 +4,63 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ApiRestStock.CRUD.stock.DTOs.EditProductRequest;
+import com.ApiRestStock.CRUD.stock.DTOs.InventarioStatsResponse;
+
 @Service
 public class ProductService {
+
+    // Constante para definir el límite de stock bajo (puedes cambiar este valor según necesites)
+    private static  Integer LIMITE_STOCK_BAJO = 5;
 
     @Autowired
     IProductRepository productRepository;
 
     public List<ProductModel> getProductos(){
         return  this.productRepository.findAll();
+    }
+
+    /**
+     * Obtiene productos paginados
+     * @param page Número de página (base 0)
+     * @param size Tamaño de página
+     * @return Page con productos e información de paginación
+     */
+    public Page<ProductModel> getProductosPaginados(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("nombre").ascending());
+        return this.productRepository.findAll(pageable);
+    }
+
+    /**
+     * Obtiene estadísticas del inventario: productos con stock bajo y valor total
+     * @return InventarioStatsResponse con cantidad de productos con stock bajo y valor total
+     */
+    public InventarioStatsResponse getInventarioStats() {
+        Long totalProductos = productRepository.count();
+        Long productosStockBajo = productRepository.countProductosConStockBajo(LIMITE_STOCK_BAJO);
+        Long productosSinStock = productRepository.countProductosSinStock();
+        BigDecimal valorTotal = productRepository.calcularValorTotalInventario();
+        
+        return new InventarioStatsResponse(totalProductos, productosStockBajo, productosSinStock, valorTotal);
+    }
+
+    /**
+     * Busca productos por nombre o SKU (búsqueda parcial)
+     * @param searchTerm término de búsqueda
+     * @return Lista de productos que coinciden
+     */
+    public List<ProductModel> buscarProductos(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return List.of();
+        }
+        return productRepository.buscarPorNombreOSku(searchTerm.trim());
     }
 
     public ProductModel saveProduct(ProductModel producto){
@@ -62,13 +108,11 @@ public class ProductService {
     }
 
     
-    public ProductModel updateById(ProductModel producto, Long id){
+    public ProductModel updateById(EditProductRequest producto, Long id){
         ProductModel findProduct = this.productRepository.findById(id).get();
 
-        findProduct.setNombre( producto.getNombre());
-        findProduct.setPrecio( producto.getPrecio());
-        findProduct.setSku( producto.getSku());
-        findProduct.setStock( producto.getStock());
+        findProduct.setNombre( producto.nombre());
+        findProduct.setPrecio( producto.precio());
 
         return productRepository.save(findProduct);
     }
@@ -143,14 +187,6 @@ public class ProductService {
         nuevoProducto.setStock(cantidadInicial != null ? cantidadInicial : 0);
         
         return productRepository.save(nuevoProducto);
-    }
-
-
-    public Boolean productoEstaBajoStockPorNombre(String nombre){
-        ProductModel prod = productRepository.findByNombre(nombre)
-        .orElseThrow( () -> new RuntimeException("Producto no encontrado"));
-
-        return prod.isBajoStock();
     }
 
     

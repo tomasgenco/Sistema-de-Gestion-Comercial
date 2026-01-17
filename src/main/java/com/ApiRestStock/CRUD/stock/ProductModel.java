@@ -20,7 +20,7 @@ import jakarta.persistence.UniqueConstraint;
 )
 public class ProductModel {
 
-    private Integer stockMinimo = 5;
+
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -75,13 +75,6 @@ public class ProductModel {
         return stock;
     }
 
-    public void setStockMinimo(Integer nuevo){
-        stockMinimo = nuevo;
-    }
-
-    public Boolean isBajoStock(){
-        return stock <= stockMinimo;
-    }
     
 
 

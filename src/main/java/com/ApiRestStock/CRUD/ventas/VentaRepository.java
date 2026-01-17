@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -49,6 +51,24 @@ public interface VentaRepository extends JpaRepository<VentaModel, Long> {
     );
 
     /**
+     * Busca ventas por método de pago (búsqueda parcial case-insensitive)
+     */
+    @Query("SELECT v FROM VentaModel v WHERE LOWER(CAST(v.metodoPago AS string)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) ORDER BY v.fechaHora DESC")
+    List<VentaModel> buscarPorMetodoPago(@Param("searchTerm") String searchTerm);
+
+    /**
+     * Busca ventas por fecha (YYYY-MM-DD)
+     */
+    @Query("SELECT v FROM VentaModel v WHERE CAST(v.fechaHora AS date) = :fecha ORDER BY v.fechaHora DESC")
+    List<VentaModel> buscarPorFecha(@Param("fecha") LocalDate fecha);
+
+    /**
+     * Busca ventas por método de pago y fecha
+     */
+    @Query("SELECT v FROM VentaModel v WHERE LOWER(CAST(v.metodoPago AS string)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND CAST(v.fechaHora AS date) = :fecha ORDER BY v.fechaHora DESC")
+    List<VentaModel> buscarPorMetodoPagoYFecha(@Param("searchTerm") String searchTerm, @Param("fecha") LocalDate fecha);
+
+    /**
      * Cuenta la cantidad de ventas del mes actual.
      */
     @Query("""
@@ -63,8 +83,29 @@ public interface VentaRepository extends JpaRepository<VentaModel, Long> {
     );
 
     /**
+     * Cuenta la cantidad de ventas de un día específico.
+     */
+    @Query("SELECT COUNT(v) FROM VentaModel v WHERE CAST(v.fechaHora AS date) = :fecha")
+    Long countVentasDelDia(@Param("fecha") LocalDate fecha);
+
+    /**
      * Obtiene las últimas 5 ventas ordenadas por fecha descendente.
      */
     List<VentaModel> findTop5ByOrderByFechaHoraDesc();
+
+    /**
+     * Obtiene las ventas del día actual agrupadas por hora.
+     * Retorna: hora (0-23), cantidad de ventas, total de ventas.
+     */
+    @Query(value = """
+        SELECT EXTRACT(HOUR FROM fecha_hora) as hora,
+               COUNT(venta_id) as cantidadVentas,
+               COALESCE(SUM(total), 0) as totalVentas
+        FROM venta
+        WHERE DATE(fecha_hora) = :fecha
+        GROUP BY EXTRACT(HOUR FROM fecha_hora)
+        ORDER BY hora
+    """, nativeQuery = true)
+    List<Object[]> findVentasAgrupadasPorHora(@Param("fecha") LocalDate fecha);
 
 }

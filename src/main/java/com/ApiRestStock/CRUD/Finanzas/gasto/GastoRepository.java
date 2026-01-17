@@ -27,4 +27,8 @@ public interface GastoRepository extends JpaRepository<GastoModel, Long> {
     @Query ("SELECT COALESCE(SUM(g.total), 0) FROM GastoModel g WHERE g.fecha BETWEEN :desde AND :hasta")
     public Double sumTotalGastosBetween(java.time.OffsetDateTime desde, java.time.OffsetDateTime hasta);
 
+    // Sumar gastos del día específico
+    @Query("SELECT COALESCE(SUM(g.total), 0) FROM GastoModel g WHERE CAST(g.fecha AS date) = :fecha")
+    java.math.BigDecimal sumGastosDelDia(LocalDate fecha);
+
 }

@@ -1,6 +1,7 @@
 package com.ApiRestStock.CRUD.Finanzas.ingreso;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoIngreso;
+import com.ApiRestStock.CRUD.Finanzas.ingreso.DTOs.IngresoPorMetodoPagoDTO;
 import com.ApiRestStock.CRUD.ventas.VentaModel;
+import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 import com.ApiRestStock.CRUD.ventas.fiado.FiadoModel;
 
 @Service
@@ -54,5 +57,20 @@ public class IngresoService {
 
         Double total = ingresoRepository.sumTotalIngresosBetween(desde00, hasta);
         return total != null ? total : 0.0;
+    }
+
+    /**
+     * Obtiene los ingresos del día actual agrupados por método de pago
+     */
+    public List<IngresoPorMetodoPagoDTO> getIngresosPorMetodoPagoDelDia() {
+        LocalDate hoy = LocalDate.now();
+        List<Object[]> resultados = ingresoRepository.findIngresosPorMetodoPagoDelDia(hoy);
+        
+        return resultados.stream()
+            .map(row -> new IngresoPorMetodoPagoDTO(
+                (MetodoPago) row[0],
+                (BigDecimal) row[1]
+            ))
+            .toList();
     }
 }

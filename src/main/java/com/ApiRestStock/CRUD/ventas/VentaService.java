@@ -1,18 +1,28 @@
 package com.ApiRestStock.CRUD.ventas;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoIngreso;
+import com.ApiRestStock.CRUD.Finanzas.gasto.GastoRepository;
+import com.ApiRestStock.CRUD.Finanzas.ingreso.IngresoRepository;
 import com.ApiRestStock.CRUD.Finanzas.ingreso.IngresoService;
 import com.ApiRestStock.CRUD.stock.ProductService;
 import com.ApiRestStock.CRUD.ventas.DTOs.ItemVentaRequest;
+import com.ApiRestStock.CRUD.ventas.DTOs.VentaPorHoraDTO;
 import com.ApiRestStock.CRUD.ventas.DTOs.VentaResponse;
+import com.ApiRestStock.CRUD.ventas.DTOs.VentasStatsResponse;
+import com.ApiRestStock.CRUD.ventas.DTOs.DetalleVentaResponse;
 import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 
 import jakarta.transaction.Transactional;
@@ -28,6 +38,12 @@ public class VentaService {
 
     @Autowired
     IngresoService ingresoService;
+
+    @Autowired
+    IngresoRepository ingresoRepository;
+
+    @Autowired
+    GastoRepository gastoRepository;
     
 
     public BigDecimal calcularTotal(VentaModel venta) {
@@ -46,12 +62,89 @@ public class VentaService {
         return ventaRepository.findAll();
     }
 
+    /**
+     * Obtiene ventas paginadas ordenadas por fecha descendente
+     * @param page Número de página (base 0)
+     * @param size Tamaño de página
+     * @return Page con ventas
+     */
+    public Page<VentaResponse> getVentasPaginadas(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("fechaHora").descending());
+        Page<VentaModel> ventasPage = ventaRepository.findAll(pageable);
+        
+        // Convertir a DTO
+        return ventasPage.map(venta -> new VentaResponse(
+            venta.getId(),
+            venta.getFechaHora(),
+            venta.getTotal(),
+            venta.getMetodoPago(),
+            venta.getDetalles().stream()
+                .map(detalle -> new DetalleVentaResponse(
+                    detalle.getId(),
+                    detalle.getNombreProducto(),
+                    detalle.getCantidad(),
+                    detalle.getPrecioUnitario()
+                ))
+                .toList()
+        ));
+    }
+
+    /**
+     * Busca ventas por método de pago y/o fecha
+     * @param searchTerm término de búsqueda para método de pago (opcional)
+     * @param fecha fecha en formato LocalDate (opcional)
+     * @return Lista de ventas que coinciden
+     */
+    public List<VentaModel> buscarVentas(String searchTerm, LocalDate fecha) {
+        // Si ambos parámetros son nulos o vacíos, retornar vacío
+        if ((searchTerm == null || searchTerm.trim().isEmpty()) && fecha == null) {
+            return List.of();
+        }
+        
+        // Buscar por ambos criterios
+        if (searchTerm != null && !searchTerm.trim().isEmpty() && fecha != null) {
+            return ventaRepository.buscarPorMetodoPagoYFecha(searchTerm.trim(), fecha);
+        }
+        
+        // Buscar solo por fecha
+        if (fecha != null) {
+            return ventaRepository.buscarPorFecha(fecha);
+        }
+        
+        // Buscar solo por método de pago
+        return ventaRepository.buscarPorMetodoPago(searchTerm.trim());
+    }
+
     public Long getCantidadVentasDelMes() {
         OffsetDateTime ahora = OffsetDateTime.now();
         int anio = ahora.getYear();
         int mes = ahora.getMonthValue();
         return ventaRepository.countVentasDelMes(anio, mes);
     }
+
+    /**
+     * Obtiene estadísticas de ventas: cantidad del mes, ingresos del día y egresos del día
+     */
+    public VentasStatsResponse getVentasStats() {
+        // Ventas del mes
+        Long ventasDelMes = getCantidadVentasDelMes();
+        
+        // Ventas del día
+        LocalDate hoy = LocalDate.now();
+        Long ventasDelDia = ventaRepository.countVentasDelDia(hoy);
+        
+        // Ingresos y gastos del día actual
+        BigDecimal ingresosDelDia = ingresoRepository.sumIngresosDelDia(hoy);
+        BigDecimal gastosDelDia = gastoRepository.sumGastosDelDia(hoy);
+
+        System.out.println("Ingresos del día: " + ingresosDelDia);
+        System.out.println("Gastos del día: " + gastosDelDia);
+        System.out.println("Ventas del mes: " + ventasDelMes);
+        System.out.println("Ventas del día: " + ventasDelDia);
+        
+        return new VentasStatsResponse(ventasDelMes, ventasDelDia, ingresosDelDia, gastosDelDia);
+    }
+
 
     public List<VentaResponse> getUltimas5Ventas() {
         List<VentaModel> ventas = ventaRepository.findTop5ByOrderByFechaHoraDesc();
@@ -60,7 +153,33 @@ public class VentaService {
                     venta.getId(),
                     venta.getFechaHora(),
                     venta.getTotal(),
-                    venta.getMetodoPago()
+                    venta.getMetodoPago(),
+                    venta.getDetalles().stream()
+                        .map(detalle -> new DetalleVentaResponse(
+                            detalle.getId(),
+                            detalle.getNombreProducto(),
+                            detalle.getCantidad(),
+                            detalle.getPrecioUnitario()
+                        ))
+                        .toList()
+                ))
+                .toList();
+    }
+
+    /**
+     * Obtiene las ventas del día actual agrupadas por hora.
+     * Diseñado para ser consumido por gráficos Rechart.
+     * @return Lista de VentaPorHoraDTO con hora, cantidad y total de ventas
+     */
+    public List<VentaPorHoraDTO> getVentasPorHoraDelDia() {
+        LocalDate hoy = LocalDate.now();
+        List<Object[]> resultados = ventaRepository.findVentasAgrupadasPorHora(hoy);
+        
+        return resultados.stream()
+                .map(row -> new VentaPorHoraDTO(
+                    ((Number) row[0]).intValue(),  // hora
+                    ((Number) row[1]).longValue(), // cantidadVentas
+                    (BigDecimal) row[2]            // totalVentas
                 ))
                 .toList();
     }

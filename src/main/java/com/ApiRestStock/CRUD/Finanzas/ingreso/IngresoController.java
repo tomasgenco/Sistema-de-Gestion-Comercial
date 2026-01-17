@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoIngreso;
+import com.ApiRestStock.CRUD.Finanzas.ingreso.DTOs.IngresoPorMetodoPagoDTO;
 
 
 @RestController
@@ -27,6 +28,14 @@ public class IngresoController {
         } else {
             return ingresoService.getAllIngresos();
         }
+    }
+
+    /**
+     * Obtiene los ingresos del día agrupados por método de pago
+     */
+    @GetMapping("/hoy/por-metodo-pago")
+    public List<IngresoPorMetodoPagoDTO> getIngresosPorMetodoPagoDelDia() {
+        return ingresoService.getIngresosPorMetodoPagoDelDia();
     }
 
     @GetMapping("/total")
