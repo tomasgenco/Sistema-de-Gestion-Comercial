@@ -121,6 +121,30 @@ public class AuthController {
             .body(response);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie deletedAccessCookie = ResponseCookie.from(cookieName, "")
+            .httpOnly(true)
+            .secure(cookieSecure)
+            .path(cookiePath)
+            .sameSite(cookieSameSite)
+            .maxAge(0)
+            .build();
+
+        ResponseCookie deletedRefreshCookie = ResponseCookie.from(refreshCookieName, "")
+            .httpOnly(true)
+            .secure(cookieSecure)
+            .path(cookiePath)
+            .sameSite(cookieSameSite)
+            .maxAge(0)
+            .build();
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, deletedAccessCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, deletedRefreshCookie.toString())
+            .build();
+    }
+
     private String readCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
