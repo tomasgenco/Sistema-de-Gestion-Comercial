@@ -18,11 +18,11 @@ import com.ApiRestStock.CRUD.Finanzas.gasto.GastoRepository;
 import com.ApiRestStock.CRUD.Finanzas.ingreso.IngresoRepository;
 import com.ApiRestStock.CRUD.Finanzas.ingreso.IngresoService;
 import com.ApiRestStock.CRUD.stock.ProductService;
+import com.ApiRestStock.CRUD.ventas.DTOs.DetalleVentaResponse;
 import com.ApiRestStock.CRUD.ventas.DTOs.ItemVentaRequest;
 import com.ApiRestStock.CRUD.ventas.DTOs.VentaPorHoraDTO;
 import com.ApiRestStock.CRUD.ventas.DTOs.VentaResponse;
 import com.ApiRestStock.CRUD.ventas.DTOs.VentasStatsResponse;
-import com.ApiRestStock.CRUD.ventas.DTOs.DetalleVentaResponse;
 import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 
 import jakarta.transaction.Transactional;
@@ -101,9 +101,12 @@ public class VentaService {
             return List.of();
         }
         
+        // Normalizar el término de búsqueda: reemplazar espacios por guiones bajos
+        String normalizedTerm = searchTerm != null ? searchTerm.trim().replace(" ", "_") : null;
+        
         // Buscar por ambos criterios
-        if (searchTerm != null && !searchTerm.trim().isEmpty() && fecha != null) {
-            return ventaRepository.buscarPorMetodoPagoYFecha(searchTerm.trim(), fecha);
+        if (normalizedTerm != null && !normalizedTerm.isEmpty() && fecha != null) {
+            return ventaRepository.buscarPorMetodoPagoYFecha(normalizedTerm, fecha);
         }
         
         // Buscar solo por fecha
@@ -112,7 +115,7 @@ public class VentaService {
         }
         
         // Buscar solo por método de pago
-        return ventaRepository.buscarPorMetodoPago(searchTerm.trim());
+        return ventaRepository.buscarPorMetodoPago(normalizedTerm);
     }
 
     public Long getCantidadVentasDelMes() {
