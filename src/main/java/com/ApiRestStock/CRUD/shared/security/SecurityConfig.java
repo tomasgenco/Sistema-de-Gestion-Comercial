@@ -34,12 +34,17 @@ public class SecurityConfig {
                 // Públicos
                 .requestMatchers("/auth/**").permitAll()
 
-                // VENDEDOR + ADMIN: registrar ventas y compras
+                // VENDEDOR + ADMIN: ventas (GET y POST)
+                .requestMatchers(HttpMethod.GET, "/ventas/**").hasAnyRole("ADMIN", "VENDEDOR")
                 .requestMatchers(HttpMethod.POST, "/ventas/**").hasAnyRole("ADMIN", "VENDEDOR")
+                
+                // VENDEDOR + ADMIN: compras (POST)
                 .requestMatchers(HttpMethod.POST, "/compras/**").hasAnyRole("ADMIN", "VENDEDOR")
+                .requestMatchers(HttpMethod.GET, "/compras/**").hasAnyRole("ADMIN", "VENDEDOR")
 
-                // Si en tu proyecto compras a proveedor se llaman "ingresos":
-                // .requestMatchers(HttpMethod.POST, "/ingresos/**").hasAnyRole("ADMIN", "VENDEDOR")
+                // VENDEDOR + ADMIN: proveedores (GET y POST)
+                .requestMatchers(HttpMethod.GET, "/proveedores/**").hasAnyRole("ADMIN", "VENDEDOR")
+                .requestMatchers(HttpMethod.POST, "/proveedores/**").hasAnyRole("ADMIN", "VENDEDOR")
 
                 // Todo lo demás: solo ADMIN
                 .anyRequest().hasRole("ADMIN")

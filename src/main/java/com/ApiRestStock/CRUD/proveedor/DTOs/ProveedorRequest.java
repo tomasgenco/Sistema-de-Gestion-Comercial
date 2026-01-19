@@ -1,7 +1,19 @@
 package com.ApiRestStock.CRUD.proveedor.DTOs;
 
+
 public record ProveedorRequest(
-    String nombre,
-    String cuit
+    String nombreEmpresa,
+    
+    String cuit,
+    
+    String personaContacto,
+    
+    String email,
+    
+    String telefono,
+    
+    String direccion,
+    
+    Boolean activo
 ) {
 }

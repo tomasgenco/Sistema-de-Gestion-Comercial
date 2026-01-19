@@ -47,7 +47,7 @@ public class GastoController {
     }
 
     @GetMapping("/total")
-    public double getTotalIngresos(@RequestParam(name = "dias", required = false) Integer dias) {
+    public double getTotalGastos(@RequestParam(name = "dias", required = false) Integer dias) {
         if (dias == null) {
             return gastoService.getTotalGastos();
         }
