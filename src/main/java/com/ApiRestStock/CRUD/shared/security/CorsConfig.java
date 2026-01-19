@@ -7,16 +7,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class CorsConfig {
+    
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins:http://localhost:4173,http://localhost:5173}")
+    private String[] allowedOrigins;
+    
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:4173", "http://localhost:5173") // Cambia por la URL de tu front si es necesario
+                    .allowedOrigins(allowedOrigins)
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
-                    .allowCredentials(true);
+                    .allowCredentials(true)
+                    .exposedHeaders("Set-Cookie");
             }
         };
     }
