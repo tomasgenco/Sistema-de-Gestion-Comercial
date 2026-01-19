@@ -29,8 +29,10 @@ public interface ProveedorRepository extends JpaRepository<ProveedorModel, Long>
     // Contar proveedores activos
     Long countByActivo(Boolean activo);
 
-    // Calcular el total gastado sumando totalCompras de todos los proveedores
-    @Query("SELECT COALESCE(SUM(p.totalCompras), 0) FROM ProveedorModel p")
+    // Calcular el total gastado del mes actual sumando las compras del mes
+    @Query("SELECT COALESCE(SUM(c.total), 0) FROM CompraModel c WHERE " +
+           "EXTRACT(MONTH FROM c.fechaHora) = EXTRACT(MONTH FROM CURRENT_TIMESTAMP) AND " +
+           "EXTRACT(YEAR FROM c.fechaHora) = EXTRACT(YEAR FROM CURRENT_TIMESTAMP)")
     BigDecimal calcularTotalGastado();
 
     /**
