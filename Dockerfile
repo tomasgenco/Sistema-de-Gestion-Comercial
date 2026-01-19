@@ -1,11 +1,11 @@
-# Etapa de build (compila el proyecto)
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Etapa de build (Java 21)
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /build
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Etapa de runtime (ejecuta el jar)
-FROM eclipse-temurin:17-jre
+# Etapa de runtime (Java 21)
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /build/target/*.jar app.jar
 
