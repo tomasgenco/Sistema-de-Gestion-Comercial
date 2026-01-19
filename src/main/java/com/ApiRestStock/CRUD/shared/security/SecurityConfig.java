@@ -44,6 +44,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Públicos
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // VENDEDOR + ADMIN: ventas (GET y POST)
                 .requestMatchers(HttpMethod.GET, "/ventas/**").hasAnyRole("ADMIN", "VENDEDOR")
