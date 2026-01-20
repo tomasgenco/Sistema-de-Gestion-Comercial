@@ -2,6 +2,7 @@ package com.ApiRestStock.CRUD.Finanzas.Compra;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,7 +127,7 @@ public class CompraService {
         CompraModel compraModel = new CompraModel();
         compraModel.setMetodoPago(metodoPago);
         compraModel.setProveedor(proveedorService.getProveedorByNombreEmpresa(nombreProveedor));
-        compraModel.setFechaHora(OffsetDateTime.now());
+        compraModel.setFechaHora(OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires")));
         
 
         for (ItemCompraRequest item : items) {
@@ -197,7 +198,7 @@ public class CompraService {
         CompraModel compraModel = new CompraModel();
         compraModel.setMetodoPago(metodoPago);
         compraModel.setProveedor(proveedor);
-        compraModel.setFechaHora(OffsetDateTime.now());
+        compraModel.setFechaHora(OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires")));
         
 
         for (ItemCompraRequest item : items) {

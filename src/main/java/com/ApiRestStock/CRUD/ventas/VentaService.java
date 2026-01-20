@@ -3,6 +3,7 @@ package com.ApiRestStock.CRUD.ventas;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,7 +120,7 @@ public class VentaService {
     }
 
     public Long getCantidadVentasDelMes() {
-        OffsetDateTime ahora = OffsetDateTime.now();
+        OffsetDateTime ahora = OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires"));
         int anio = ahora.getYear();
         int mes = ahora.getMonthValue();
         return ventaRepository.countVentasDelMes(anio, mes);
@@ -139,11 +140,6 @@ public class VentaService {
         // Ingresos y gastos del día actual
         BigDecimal ingresosDelDia = ingresoRepository.sumIngresosDelDia(hoy);
         BigDecimal gastosDelDia = gastoRepository.sumGastosDelDia(hoy);
-
-        System.out.println("Ingresos del día: " + ingresosDelDia);
-        System.out.println("Gastos del día: " + gastosDelDia);
-        System.out.println("Ventas del mes: " + ventasDelMes);
-        System.out.println("Ventas del día: " + ventasDelDia);
         
         return new VentasStatsResponse(ventasDelMes, ventasDelDia, ingresosDelDia, gastosDelDia);
     }
@@ -192,7 +188,7 @@ public VentaModel registrarVenta(List<ItemVentaRequest> items, MetodoPago metodo
 
     VentaModel venta = new VentaModel();
     venta.setMetodoPago(metodoPago);
-    venta.setFechaHora(OffsetDateTime.now());
+    venta.setFechaHora(OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires")));
 
     List<DetalleVentaModel> detalles = new ArrayList<>();
 

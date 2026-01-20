@@ -1,6 +1,8 @@
 package com.ApiRestStock.CRUD.Finanzas.gasto;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +21,7 @@ public class GastoService {
     @Transactional
     public Optional<GastoModel> registrarGasto(BigDecimal total, TipoGasto tipo, String nombreProveedor) {
         GastoModel gastoModel = new GastoModel();
-        gastoModel.setFecha(java.time.OffsetDateTime.now());
+        gastoModel.setFecha(OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires")));
         gastoModel.setTotal(total);
         gastoModel.setTipo(tipo);
         gastoModel.setNombreProveedor(nombreProveedor);
@@ -48,9 +50,9 @@ public class GastoService {
     }
 
     public double getTotalGastosLastDays(int dias) {
-        java.time.OffsetDateTime hasta = java.time.OffsetDateTime.now();
-        java.time.OffsetDateTime desde = hasta.minusDays(dias);
-        java.time.OffsetDateTime desde00 = desde.withHour(0).withMinute(0).withSecond(0).withNano(0);
+        OffsetDateTime hasta = OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires"));
+        OffsetDateTime desde = hasta.minusDays(dias);
+        OffsetDateTime desde00 = desde.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
         Double total = gastoRepository.sumTotalGastosBetween(desde00, hasta);
         return total != null ? total : 0.0;

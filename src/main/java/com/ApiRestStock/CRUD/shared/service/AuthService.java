@@ -2,6 +2,7 @@ package com.ApiRestStock.CRUD.shared.service;
 
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,7 +43,7 @@ public class AuthService {
         user.setUsername(userNameNorm);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRol(RolUsuario.VENDEDOR);
-        user.setFechaCreacion(OffsetDateTime.now());
+        user.setFechaCreacion(OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires")));
         user = userRepository.save(user);
 
         String accessToken = jwtService.generateAccessToken(userNameNorm, user.getRol().name());

@@ -3,6 +3,7 @@ package com.ApiRestStock.CRUD.Finanzas.ingreso;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public class IngresoService {
 
     public Optional<IngresoModel> registrarIngreso(BigDecimal total, TipoIngreso tipo, VentaModel venta, FiadoModel fiado) {
         IngresoModel nuevoIngreso = new IngresoModel();
-        nuevoIngreso.setFecha(java.time.OffsetDateTime.now());
+        nuevoIngreso.setFecha(OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires")));
         nuevoIngreso.setTotal(total);
         nuevoIngreso.setTipo(tipo);
         nuevoIngreso.setVenta(venta);
@@ -51,7 +52,7 @@ public class IngresoService {
     }
 
     public double getTotalIngresosLastDays(int dias) {
-        OffsetDateTime hasta = OffsetDateTime.now();
+        OffsetDateTime hasta = OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires"));
         OffsetDateTime desde = hasta.minusDays(dias);
         OffsetDateTime desde00 = desde.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
