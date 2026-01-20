@@ -132,11 +132,13 @@ public class VentaService {
         // Ventas del mes
         Long ventasDelMes = getCantidadVentasDelMes();
         
-        // Ventas del día
-        LocalDate hoy = LocalDate.now();
-        Long ventasDelDia = ventaRepository.countVentasDelDia(hoy);
+        // Ventas del día - usar OffsetDateTime para respetar zona horaria
+        OffsetDateTime inicioDia = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        OffsetDateTime finDia = inicioDia.plusDays(1);
+        Long ventasDelDia = ventaRepository.countVentasByFechaHoraBetween(inicioDia, finDia);
         
         // Ingresos y gastos del día actual
+        LocalDate hoy = LocalDate.now();
         BigDecimal ingresosDelDia = ingresoRepository.sumIngresosDelDia(hoy);
         BigDecimal gastosDelDia = gastoRepository.sumGastosDelDia(hoy);
 

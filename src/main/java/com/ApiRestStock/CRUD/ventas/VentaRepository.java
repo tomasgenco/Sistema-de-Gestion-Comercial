@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -87,6 +85,12 @@ public interface VentaRepository extends JpaRepository<VentaModel, Long> {
      */
     @Query("SELECT COUNT(v) FROM VentaModel v WHERE CAST(v.fechaHora AS date) = :fecha")
     Long countVentasDelDia(@Param("fecha") LocalDate fecha);
+
+    /**
+     * Cuenta ventas en un rango de fechas (usado para contar ventas del día con zona horaria correcta)
+     */
+    @Query("SELECT COUNT(v) FROM VentaModel v WHERE v.fechaHora >= :desde AND v.fechaHora < :hasta")
+    Long countVentasByFechaHoraBetween(@Param("desde") OffsetDateTime desde, @Param("hasta") OffsetDateTime hasta);
 
     /**
      * Obtiene las últimas 5 ventas ordenadas por fecha descendente.
