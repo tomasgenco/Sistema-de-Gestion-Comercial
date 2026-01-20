@@ -1,9 +1,8 @@
 package com.ApiRestStock.CRUD.stock;
 
 import java.math.BigDecimal;
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,9 +30,9 @@ public interface IProductRepository extends JpaRepository<ProductModel, Long>{
     Long countProductosSinStock();
 
     /**
-     * Calcula el valor total del inventario (suma de precio * stock)
+     * Calcula el valor total del inventario (suma de precio_venta * stock)
      */
-    @Query("SELECT COALESCE(SUM(p.precio * p.stock), 0) FROM ProductModel p")
+    @Query("SELECT COALESCE(SUM(p.precioVenta * p.stock), 0) FROM ProductModel p")
     BigDecimal calcularValorTotalInventario();
 
     /**

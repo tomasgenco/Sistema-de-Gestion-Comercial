@@ -30,8 +30,11 @@ public class ProductModel {
     @Column(nullable = false, length = 255)
     private String nombre;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal precio;
+    @Column(name = "precio_venta", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioVenta;
+
+    @Column(name = "precio_compra", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioCompra;
 
     @Column(nullable = false, length = 50)
     private String sku;
@@ -51,12 +54,20 @@ public class ProductModel {
         return nombre;
     }
 
-    public void setPrecio(BigDecimal precio){
-        this.precio = precio;
+    public void setPrecioVenta(BigDecimal precioVenta){
+        this.precioVenta = precioVenta;
     }
 
-    public BigDecimal getPrecio(){
-        return precio;
+    public BigDecimal getPrecioVenta(){
+        return precioVenta;
+    }
+
+    public void setPrecioCompra(BigDecimal precioCompra){
+        this.precioCompra = precioCompra;
+    }
+
+    public BigDecimal getPrecioCompra(){
+        return precioCompra;
     }
 
     public void setSku(String sku){

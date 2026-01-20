@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ApiRestStock.CRUD.stock.DTOs.CreateProductRequest;
 import com.ApiRestStock.CRUD.stock.DTOs.EditProductRequest;
 import com.ApiRestStock.CRUD.stock.DTOs.InventarioStatsResponse;
 
@@ -63,7 +64,14 @@ public class ProductService {
         return productRepository.buscarPorNombreOSku(searchTerm.trim());
     }
 
-    public ProductModel saveProduct(ProductModel producto){
+    public ProductModel saveProduct(ProductModel request){
+        ProductModel producto = new ProductModel();
+        producto.setNombre(request.getNombre());
+        producto.setSku(request.getSku());
+        producto.setPrecioVenta(request.getPrecioVenta());
+        producto.setPrecioCompra(request.getPrecioCompra());
+        producto.setStock(request.getStock() != null && request.getStock() >= 0 ? request.getStock() : 0);
+        
         return productRepository.save(producto);
     }
 
@@ -111,8 +119,9 @@ public class ProductService {
     public ProductModel updateById(EditProductRequest producto, Long id){
         ProductModel findProduct = this.productRepository.findById(id).get();
 
-        findProduct.setNombre( producto.nombre());
-        findProduct.setPrecio( producto.precio());
+        findProduct.setNombre(producto.nombre());
+        findProduct.setPrecioVenta(producto.precioVenta());
+        findProduct.setPrecioCompra(producto.precioCompra());
 
         return productRepository.save(findProduct);
     }
@@ -166,7 +175,7 @@ public class ProductService {
      * @return ProductModel existente o recién creado
      */
     @Transactional
-    public ProductModel buscarOCrearProducto(String sku, String nombreProducto, BigDecimal precioUnitario, Integer cantidadInicial) {
+    public ProductModel buscarOCrearProducto(String sku, String nombreProducto, BigDecimal precioVenta, BigDecimal precioCompra, Integer cantidadInicial) {
         // Primero buscar por SKU (más confiable que por nombre)
         Optional<ProductModel> productoPorSku = productRepository.findBySku(sku);
         if (productoPorSku.isPresent()) {
@@ -182,7 +191,8 @@ public class ProductService {
         // Si no existe ni por SKU ni por nombre, crear uno nuevo con el SKU proporcionado
         ProductModel nuevoProducto = new ProductModel();
         nuevoProducto.setNombre(nombreProducto);
-        nuevoProducto.setPrecio(precioUnitario);
+        nuevoProducto.setPrecioVenta(precioVenta);
+        nuevoProducto.setPrecioCompra(precioCompra);
         nuevoProducto.setSku(sku);
         nuevoProducto.setStock(cantidadInicial != null ? cantidadInicial : 0);
         

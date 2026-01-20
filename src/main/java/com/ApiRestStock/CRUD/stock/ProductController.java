@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ApiRestStock.CRUD.stock.DTOs.CreateProductRequest;
 import com.ApiRestStock.CRUD.stock.DTOs.EditProductRequest;
 import com.ApiRestStock.CRUD.stock.DTOs.InventarioStatsResponse;
 
@@ -102,8 +103,8 @@ public class ProductController {
 
 
     @PostMapping
-    public ResponseEntity<ProductModel> saveProduct(@RequestBody ProductModel producto){
-        ProductModel savedProduct = this.productService.saveProduct(producto);
+    public ResponseEntity<ProductModel> saveProduct(@RequestBody CreateProductRequest request){
+        ProductModel savedProduct = this.productService.saveProduct(request);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
