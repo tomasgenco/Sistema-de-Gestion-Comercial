@@ -3,7 +3,6 @@ package com.ApiRestStock.CRUD.proveedor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

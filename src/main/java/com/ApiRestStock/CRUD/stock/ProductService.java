@@ -10,8 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ApiRestStock.CRUD.stock.DTOs.CreateProductRequest;
+  
 import com.ApiRestStock.CRUD.stock.DTOs.EditProductRequest;
 import com.ApiRestStock.CRUD.stock.DTOs.InventarioStatsResponse;
 
