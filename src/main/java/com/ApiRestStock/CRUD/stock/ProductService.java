@@ -17,7 +17,7 @@ import com.ApiRestStock.CRUD.stock.DTOs.InventarioStatsResponse;
 @Service
 public class ProductService {
 
-    // Constante para definir el límite de stock bajo (puedes cambiar este valor según necesites)
+    // Constante para definir el límite de stock bajo
     private static  Integer LIMITE_STOCK_BAJO = 5;
 
     @Autowired
