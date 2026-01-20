@@ -103,7 +103,7 @@ public class ProductController {
 
 
     @PostMapping
-    public ResponseEntity<ProductModel> saveProduct(@RequestBody CreateProductRequest request){
+    public ResponseEntity<ProductModel> saveProduct(@RequestBody ProductModel request) {
         ProductModel savedProduct = this.productService.saveProduct(request);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);

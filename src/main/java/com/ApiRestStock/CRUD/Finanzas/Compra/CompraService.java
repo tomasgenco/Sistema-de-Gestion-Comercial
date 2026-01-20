@@ -18,7 +18,6 @@ import com.ApiRestStock.CRUD.Finanzas.Compra.DTOs.CompraResponse;
 import com.ApiRestStock.CRUD.Finanzas.Compra.DTOs.DetalleCompraResponse;
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoGasto;
 import com.ApiRestStock.CRUD.Finanzas.exception.NoFoundComprasProveedorException;
-import com.ApiRestStock.CRUD.Finanzas.exception.ProductosFaltantesException;
 import com.ApiRestStock.CRUD.Finanzas.gasto.GastoService;
 import com.ApiRestStock.CRUD.Finanzas.ingreso.DTOs.ItemCompraRequest;
 import com.ApiRestStock.CRUD.proveedor.ProveedorService;
@@ -90,37 +89,8 @@ public class CompraService {
 
 
 
-    /**
-     * Valida que todos los productos de la compra existan en la base de datos.
-     * Si algún producto no existe y no tiene SKU proporcionado, lanza una excepción
-     * indicando qué productos necesitan SKU.
-     * 
-     * @param items Lista de items de la compra
-     * @throws ProductosFaltantesException Si hay productos que no existen y no tienen SKU
-     */
-    private void validarProductos(List<ItemCompraRequest> items) {
-        List<String> productosFaltantes = new ArrayList<>();
-        
-        for (ItemCompraRequest item : items) {
-            // Verificar si el producto existe
-            boolean existe = productService.existeProducto(item.nombreProducto(), item.sku());
-            
-            // Si no existe y no tiene SKU, agregarlo a la lista de productos faltantes
-            if (!existe && (item.sku() == null || item.sku().trim().isEmpty())) {
-                productosFaltantes.add(item.nombreProducto());
-            }
-        }
-        
-        // Si hay productos faltantes sin SKU, lanzar excepción
-        if (!productosFaltantes.isEmpty()) {
-            throw new ProductosFaltantesException(productosFaltantes);
-        }
-    }
-
     @Transactional
     public CompraModel registrarCompra(List<ItemCompraRequest> items, MetodoPago metodoPago, String nombreProveedor) {
-        // Validar primero que todos los productos existan o tengan SKU proporcionado
-        validarProductos(items);
 
         BigDecimal total;
         
@@ -131,40 +101,18 @@ public class CompraService {
         
 
         for (ItemCompraRequest item : items) {
-            ProductModel producto;
-            
-            // Si el producto no existe, crearlo con el SKU proporcionado
-            // Si existe, obtenerlo
-            if (!productService.existeProducto(item.nombreProducto(), item.sku())) {
-                // El producto no existe, crearlo con el SKU proporcionado
-                // (ya validamos que tenga SKU en validarProductos)
-                producto = productService.buscarOCrearProducto(
-                    item.sku(),           // SKU (código de barras) proporcionado por el cliente
-                    item.nombreProducto(),
-                    item.precioUnitario(),
-                    0 // Stock inicial 0, se sumará después
-                );
-            } else {
-                // El producto existe, obtenerlo
-                // Buscar primero por SKU si está disponible, sino por nombre
-                if (item.sku() != null && !item.sku().trim().isEmpty()) {
-                    producto = productService.getProductBySku(item.sku());
-                } else {
-                    producto = productService.getProductByNombre(item.nombreProducto());
-                }
-            }
+            // Obtener el producto existente
+            ProductModel producto = productService.getProductByNombre(item.nombreProducto());
             
             // Actualizar el stock sumando la cantidad comprada
-            Integer stockActual = producto.getStock();
-            producto.setStock(stockActual + item.cantidad());
-            productService.saveProduct(producto);
+            productService.actualizarStockPorNombre(item.nombreProducto(), item.cantidad(), "sumar");
             
             // Crear el detalle de compra
             DetalleCompraModel detalle = new DetalleCompraModel();
             detalle.setCantidad(item.cantidad());
             detalle.setPrecioUnitario(item.precioUnitario());
             detalle.setNombreProducto(item.nombreProducto());
-            detalle.setProducto(producto); // Vincular el producto al detalle
+            detalle.setProducto(producto);
             detalle.setCompra(compraModel);
             compraModel.getDetalles().add(detalle);
         }
@@ -187,9 +135,6 @@ public class CompraService {
 
     @Transactional
     public CompraModel registrarCompraPorProveedorId(List<ItemCompraRequest> items, MetodoPago metodoPago, Long proveedorId) {
-        // Validar primero que todos los productos existan o tengan SKU proporcionado
-        validarProductos(items);
-
         BigDecimal total;
         
         // Obtener el proveedor por ID
@@ -202,33 +147,11 @@ public class CompraService {
         
 
         for (ItemCompraRequest item : items) {
-            ProductModel producto;
-            
-            // Si el producto no existe, crearlo con el SKU proporcionado
-            // Si existe, obtenerlo
-            if (!productService.existeProducto(item.nombreProducto(), item.sku())) {
-                // El producto no existe, crearlo con el SKU proporcionado
-                // (ya validamos que tenga SKU en validarProductos)
-                producto = productService.buscarOCrearProducto(
-                    item.sku(),           // SKU (código de barras) proporcionado por el cliente
-                    item.nombreProducto(),
-                    item.precioUnitario(),
-                    0 // Stock inicial 0, se sumará después
-                );
-            } else {
-                // El producto existe, obtenerlo
-                // Buscar primero por SKU si está disponible, sino por nombre
-                if (item.sku() != null && !item.sku().trim().isEmpty()) {
-                    producto = productService.getProductBySku(item.sku());
-                } else {
-                    producto = productService.getProductByNombre(item.nombreProducto());
-                }
-            }
+            // Obtener el producto existente
+            ProductModel producto = productService.getProductByNombre(item.nombreProducto());
             
             // Actualizar el stock sumando la cantidad comprada
-            Integer stockActual = producto.getStock();
-            producto.setStock(stockActual + item.cantidad());
-            productService.saveProduct(producto);
+            productService.actualizarStockPorNombre(item.nombreProducto(), item.cantidad(), "sumar");
             
             // Crear el detalle de compra
             DetalleCompraModel detalle = new DetalleCompraModel();
