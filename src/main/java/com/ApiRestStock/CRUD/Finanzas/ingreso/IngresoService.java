@@ -64,7 +64,7 @@ public class IngresoService {
      * Obtiene los ingresos del día actual agrupados por método de pago
      */
     public List<IngresoPorMetodoPagoDTO> getIngresosPorMetodoPagoDelDia() {
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.now(ZoneId.of("America/Argentina/Buenos_Aires"));
         List<Object[]> resultados = ingresoRepository.findIngresosPorMetodoPagoDelDia(hoy);
         
         return resultados.stream()

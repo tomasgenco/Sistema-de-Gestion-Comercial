@@ -133,8 +133,8 @@ public class VentaService {
         // Ventas del mes
         Long ventasDelMes = getCantidadVentasDelMes();
         
-        // Ventas del día
-        LocalDate hoy = LocalDate.now();
+        // Ventas del día usando la zona horaria de Argentina
+        LocalDate hoy = LocalDate.now(ZoneId.of("America/Argentina/Buenos_Aires"));
         Long ventasDelDia = ventaRepository.countVentasDelDia(hoy);
         
         // Ingresos y gastos del día actual
@@ -171,7 +171,7 @@ public class VentaService {
      * @return Lista de VentaPorHoraDTO con hora, cantidad y total de ventas
      */
     public List<VentaPorHoraDTO> getVentasPorHoraDelDia() {
-        LocalDate hoy = LocalDate.now();
+        LocalDate hoy = LocalDate.now(ZoneId.of("America/Argentina/Buenos_Aires"));
         List<Object[]> resultados = ventaRepository.findVentasAgrupadasPorHora(hoy);
         
         return resultados.stream()
