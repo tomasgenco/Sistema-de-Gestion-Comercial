@@ -81,16 +81,12 @@ public interface VentaRepository extends JpaRepository<VentaModel, Long> {
     );
 
     /**
-     * Cuenta la cantidad de ventas de un día específico.
-     */
-    @Query("SELECT COUNT(v) FROM VentaModel v WHERE CAST(v.fechaHora AS date) = :fecha")
-    Long countVentasDelDia(@Param("fecha") LocalDate fecha);
-
+     * Cuenta todas las ventas de un día específico (extrae solo la fecha del OffsetDateTime)
     /**
-     * Cuenta ventas en un rango de fechas (usado para contar ventas del día con zona horaria correcta)
+     * Cuenta todas las ventas de un día específico (extrae solo la fecha del OffsetDateTime)
      */
-    @Query("SELECT COUNT(v) FROM VentaModel v WHERE v.fechaHora >= :desde AND v.fechaHora < :hasta")
-    Long countVentasByFechaHoraBetween(@Param("desde") OffsetDateTime desde, @Param("hasta") OffsetDateTime hasta);
+    @Query(value = "SELECT COUNT(*) FROM venta WHERE CAST(fecha_hora AS DATE) = CAST(:fecha AS DATE)", nativeQuery = true)
+    Long countVentasDelDia(@Param("fecha") LocalDate fecha);
 
     /**
      * Obtiene las últimas 5 ventas ordenadas por fecha descendente.
