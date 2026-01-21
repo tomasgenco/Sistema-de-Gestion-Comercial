@@ -51,7 +51,7 @@ public class VentaService {
         BigDecimal total = BigDecimal.ZERO;
         for (DetalleVentaModel detalle : venta.getDetalles()) {
 
-            BigDecimal subtotal = detalle.getPrecioUnitario().multiply(BigDecimal.valueOf(detalle.getCantidad()));
+            BigDecimal subtotal = detalle.getPrecioUnitario().multiply(detalle.getCantidad());
             total = total.add(subtotal);
         }
         

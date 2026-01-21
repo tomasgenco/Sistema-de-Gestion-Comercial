@@ -13,12 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
   
 import com.ApiRestStock.CRUD.stock.DTOs.EditProductRequest;
 import com.ApiRestStock.CRUD.stock.DTOs.InventarioStatsResponse;
+import com.ApiRestStock.CRUD.stock.Enums.TipoVenta;
 
 @Service
 public class ProductService {
 
     // Constante para definir el límite de stock bajo
-    private static  Integer LIMITE_STOCK_BAJO = 5;
+    private static final BigDecimal LIMITE_STOCK_BAJO = new BigDecimal("5");
 
     @Autowired
     IProductRepository productRepository;
@@ -69,7 +70,8 @@ public class ProductService {
         producto.setSku(request.getSku());
         producto.setPrecioVenta(request.getPrecioVenta());
         producto.setPrecioCompra(request.getPrecioCompra());
-        producto.setStock(request.getStock() != null && request.getStock() >= 0 ? request.getStock() : 0);
+        producto.setStock(request.getStock() != null && request.getStock().compareTo(BigDecimal.ZERO) >= 0 ? request.getStock() : BigDecimal.ZERO);
+        producto.setTipoVenta(request.getTipoVenta());
         
         return productRepository.save(producto);
     }
@@ -99,14 +101,14 @@ public class ProductService {
         }
     }
 
-    public void actualizarStockPorNombre(String nombreProducto, Integer cantidadVendida, String operacion){
+    public void actualizarStockPorNombre(String nombreProducto, BigDecimal cantidad, String operacion){
         ProductModel producto = getProductByNombre(nombreProducto);
-        Integer stockActual = producto.getStock();
+        BigDecimal stockActual = producto.getStock();
 
         if (operacion.toLowerCase().equals("sumar")) {
-            producto.setStock(stockActual + cantidadVendida);
+            producto.setStock(stockActual.add(cantidad));
         } else if (operacion.toLowerCase().equals("restar")) {
-            producto.setStock(stockActual - cantidadVendida);
+            producto.setStock(stockActual.subtract(cantidad));
         } else {
             throw new RuntimeException("Operacion no valida. Use 'sumar' o 'restar'.");
         }
@@ -121,6 +123,9 @@ public class ProductService {
         findProduct.setNombre(producto.nombre());
         findProduct.setPrecioVenta(producto.precioVenta());
         findProduct.setPrecioCompra(producto.precioCompra());
+        if (producto.tipoVenta() != null) {
+            findProduct.setTipoVenta(producto.tipoVenta());
+        }
 
         return productRepository.save(findProduct);
     }
@@ -174,7 +179,7 @@ public class ProductService {
      * @return ProductModel existente o recién creado
      */
     @Transactional
-    public ProductModel buscarOCrearProducto(String sku, String nombreProducto, BigDecimal precioVenta, BigDecimal precioCompra, Integer cantidadInicial) {
+    public ProductModel buscarOCrearProducto(String sku, String nombreProducto, BigDecimal precioVenta, BigDecimal precioCompra, BigDecimal cantidadInicial) {
         // Primero buscar por SKU (más confiable que por nombre)
         Optional<ProductModel> productoPorSku = productRepository.findBySku(sku);
         if (productoPorSku.isPresent()) {
@@ -193,7 +198,8 @@ public class ProductService {
         nuevoProducto.setPrecioVenta(precioVenta);
         nuevoProducto.setPrecioCompra(precioCompra);
         nuevoProducto.setSku(sku);
-        nuevoProducto.setStock(cantidadInicial != null ? cantidadInicial : 0);
+        nuevoProducto.setStock(cantidadInicial != null ? cantidadInicial : BigDecimal.ZERO);
+        nuevoProducto.setTipoVenta(TipoVenta.UNIDAD); // Valor por defecto para productos auto-creados
         
         return productRepository.save(nuevoProducto);
     }

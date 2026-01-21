@@ -78,7 +78,7 @@ public class CompraService {
 
         for (DetalleCompraModel detalle : detalles) {
             BigDecimal subtotal = detalle.getPrecioUnitario()
-                    .multiply(BigDecimal.valueOf(detalle.getCantidad()));
+                    .multiply(detalle.getCantidad());
 
             total = total.add(subtotal);
         }

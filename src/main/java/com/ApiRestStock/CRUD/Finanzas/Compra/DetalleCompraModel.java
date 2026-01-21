@@ -41,8 +41,8 @@ public class DetalleCompraModel {
     @JoinColumn(name = "producto_id", nullable = false)
     private ProductModel producto;
 
-    @Column(nullable = false)
-    private Integer cantidad;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal cantidad;
 
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
@@ -73,11 +73,11 @@ public class DetalleCompraModel {
         this.producto = producto;
     }
 
-    public Integer getCantidad() {
+    public BigDecimal getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(Integer cantidad) {
+    public void setCantidad(BigDecimal cantidad) {
         this.cantidad = cantidad;
     }
 

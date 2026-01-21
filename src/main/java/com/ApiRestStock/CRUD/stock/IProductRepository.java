@@ -21,7 +21,7 @@ public interface IProductRepository extends JpaRepository<ProductModel, Long>{
      * @param limiteStockBajo El valor máximo para considerar stock bajo
      */
     @Query("SELECT COUNT(p) FROM ProductModel p WHERE p.stock BETWEEN 1 AND :limite")
-    Long countProductosConStockBajo(@Param("limite") Integer limite);
+    Long countProductosConStockBajo(@Param("limite") BigDecimal limite);
 
     /**
      * Cuenta la cantidad de productos sin stock (stock = 0)

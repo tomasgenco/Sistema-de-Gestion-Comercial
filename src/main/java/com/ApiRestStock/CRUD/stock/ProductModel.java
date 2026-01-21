@@ -2,8 +2,12 @@ package com.ApiRestStock.CRUD.stock;
 
 import java.math.BigDecimal;
 
+import com.ApiRestStock.CRUD.stock.Enums.TipoVenta;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,11 +40,15 @@ public class ProductModel {
     @Column(name = "precio_compra", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioCompra;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = true, length = 50)
     private String sku;
 
-    @Column(nullable = false)
-    private Integer stock;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal stock;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_venta", nullable = false, length = 20)
+    private TipoVenta tipoVenta;
 
     public Long getId() {
         return id;
@@ -78,15 +86,19 @@ public class ProductModel {
         return sku;
     }
 
-    public void setStock(Integer stock){
+    public void setStock(BigDecimal stock){
         this.stock = stock;
     }
 
-    public Integer getStock(){
+    public BigDecimal getStock(){
         return stock;
     }
 
-    
+    public TipoVenta getTipoVenta() {
+        return tipoVenta;
+    }
 
-
+    public void setTipoVenta(TipoVenta tipoVenta) {
+        this.tipoVenta = tipoVenta;
+    }
 }

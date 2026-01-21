@@ -33,8 +33,8 @@ public class DetalleVentaModel {
     private Long id;
 
 
-    @Column(nullable = false)
-    private Integer cantidad;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal cantidad;
 
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
@@ -61,11 +61,11 @@ public class DetalleVentaModel {
     }
     
 
-    public Integer getCantidad() {
+    public BigDecimal getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(Integer cantidad) {
+    public void setCantidad(BigDecimal cantidad) {
         this.cantidad = cantidad;
     }
 
