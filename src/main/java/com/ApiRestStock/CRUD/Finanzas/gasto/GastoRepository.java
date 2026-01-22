@@ -31,4 +31,14 @@ public interface GastoRepository extends JpaRepository<GastoModel, Long> {
     @Query("SELECT COALESCE(SUM(g.total), 0) FROM GastoModel g WHERE CAST(g.fecha AS date) = :fecha")
     java.math.BigDecimal sumGastosDelDia(LocalDate fecha);
 
+    // Sumar gastos en EFECTIVO del día (desde compras con método EFECTIVO)
+    @Query("""
+        SELECT COALESCE(SUM(g.total), 0)
+        FROM GastoModel g
+        JOIN g.compra c
+        WHERE CAST(g.fecha AS date) = :fecha
+        AND c.metodoPago = com.ApiRestStock.CRUD.ventas.enums.MetodoPago.EFECTIVO
+    """)
+    java.math.BigDecimal sumGastosEfectivoDelDia(LocalDate fecha);
+
 }

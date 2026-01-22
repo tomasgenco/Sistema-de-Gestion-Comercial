@@ -73,21 +73,41 @@ public class VentaService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("fechaHora").descending());
         Page<VentaModel> ventasPage = ventaRepository.findAll(pageable);
         
+        // Obtener IDs de las ventas de la página actual
+        List<Long> ventaIds = ventasPage.getContent().stream()
+            .map(VentaModel::getId)
+            .toList();
+        
+        // Cargar ventas con detalles y productos usando JOIN FETCH
+        List<VentaModel> ventasConProductos = ventaIds.isEmpty() ? 
+            List.of() : 
+            ventaRepository.findByIdInWithDetallesAndProductos(ventaIds);
+        
         // Convertir a DTO
-        return ventasPage.map(venta -> new VentaResponse(
-            venta.getId(),
-            venta.getFechaHora(),
-            venta.getTotal(),
-            venta.getMetodoPago(),
-            venta.getDetalles().stream()
-                .map(detalle -> new DetalleVentaResponse(
-                    detalle.getId(),
-                    detalle.getNombreProducto(),
-                    detalle.getCantidad(),
-                    detalle.getPrecioUnitario()
-                ))
-                .toList()
-        ));
+        List<VentaResponse> ventasResponse = ventasConProductos.stream()
+            .map(venta -> new VentaResponse(
+                venta.getId(),
+                venta.getFechaHora(),
+                venta.getTotal(),
+                venta.getMetodoPago(),
+                venta.getDetalles().stream()
+                    .map(detalle -> new DetalleVentaResponse(
+                        detalle.getId(),
+                        detalle.getCantidad(),
+                        detalle.getPrecioUnitario(),
+                        detalle.getNombreProducto(),
+                        detalle.getProductoId()
+                    ))
+                    .toList()
+            ))
+            .toList();
+        
+        // Crear Page con los resultados convertidos
+        return new org.springframework.data.domain.PageImpl<>(
+            ventasResponse,
+            pageable,
+            ventasPage.getTotalElements()
+        );
     }
 
     /**
@@ -156,9 +176,10 @@ public class VentaService {
                     venta.getDetalles().stream()
                         .map(detalle -> new DetalleVentaResponse(
                             detalle.getId(),
-                            detalle.getNombreProducto(),
                             detalle.getCantidad(),
-                            detalle.getPrecioUnitario()
+                            detalle.getPrecioUnitario(),
+                            detalle.getNombreProducto(),
+                            detalle.getProductoId()
                         ))
                         .toList()
                 ))
@@ -194,11 +215,15 @@ public VentaModel registrarVenta(List<ItemVentaRequest> items, MetodoPago metodo
 
     for (ItemVentaRequest item : items) {
         
+        // Obtener el producto para establecer la FK y capturar snapshots
+        var producto = productService.getProductByNombre(item.nombreProducto());
+        
         DetalleVentaModel detalle = new DetalleVentaModel();
+        detalle.setProducto(producto); // FK al producto
         detalle.setCantidad(item.cantidad());
         detalle.setPrecioUnitario(item.precioUnitario());
-        detalle.setNombreProducto(item.nombreProducto());
-        detalle.setVenta(venta); // Establecer la referencia a la venta
+        detalle.setNombreProducto(producto.getNombre()); // Snapshot
+        detalle.setVenta(venta); // FK a la venta
         detalles.add(detalle);
         
         

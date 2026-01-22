@@ -90,7 +90,15 @@ public interface VentaRepository extends JpaRepository<VentaModel, Long> {
 
     /**
      * Obtiene las últimas 5 ventas ordenadas por fecha descendente.
+     * Usa JOIN FETCH para cargar los productos de los detalles.
      */
+    @Query("""
+        SELECT DISTINCT v FROM VentaModel v
+        LEFT JOIN FETCH v.detalles d
+        LEFT JOIN FETCH d.producto
+        ORDER BY v.fechaHora DESC
+        LIMIT 5
+    """)
     List<VentaModel> findTop5ByOrderByFechaHoraDesc();
 
     /**
@@ -107,5 +115,17 @@ public interface VentaRepository extends JpaRepository<VentaModel, Long> {
         ORDER BY hora
     """, nativeQuery = true)
     List<Object[]> findVentasAgrupadasPorHora(@Param("fecha") LocalDate fecha);
+
+    /**
+     * Obtiene ventas con detalles y productos cargados.
+     * Se usa para evitar lazy loading en consultas paginadas.
+     */
+    @Query("""
+        SELECT DISTINCT v FROM VentaModel v
+        LEFT JOIN FETCH v.detalles d
+        LEFT JOIN FETCH d.producto
+        WHERE v.id IN :ids
+    """)
+    List<VentaModel> findByIdInWithDetallesAndProductos(@Param("ids") List<Long> ids);
 
 }

@@ -49,4 +49,14 @@ public interface IngresoRepository extends JpaRepository<IngresoModel, Long>{
     """)
     List<Object[]> findIngresosPorMetodoPagoDelDia(LocalDate fecha);
 
+    // Sumar ingresos en EFECTIVO del día (desde ventas con método EFECTIVO)
+    @Query("""
+        SELECT COALESCE(SUM(i.total), 0)
+        FROM IngresoModel i
+        JOIN i.venta v
+        WHERE CAST(i.fecha AS date) = :fecha
+        AND v.metodoPago = com.ApiRestStock.CRUD.ventas.enums.MetodoPago.EFECTIVO
+    """)
+    BigDecimal sumIngresosEfectivoDelDia(LocalDate fecha);
+
 }

@@ -41,6 +41,9 @@ public class DetalleCompraModel {
     @JoinColumn(name = "producto_id", nullable = false)
     private ProductModel producto;
 
+    @Column(name = "producto_id", nullable = false, insertable = false, updatable = false)
+    private Long productoId;
+
     @Column(nullable = false, precision = 10, scale = 3)
     private BigDecimal cantidad;
 
@@ -95,5 +98,9 @@ public class DetalleCompraModel {
 
     public void setNombreProducto(String nombreProducto) {
         this.nombreProducto = nombreProducto;
+    }
+
+    public Long getProductoId() {
+        return productoId;
     }
 }

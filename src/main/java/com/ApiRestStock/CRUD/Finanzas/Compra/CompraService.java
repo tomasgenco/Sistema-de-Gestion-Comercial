@@ -3,7 +3,6 @@ package com.ApiRestStock.CRUD.Finanzas.Compra;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -199,7 +198,7 @@ public class CompraService {
                                         det.getCantidad(),
                                         det.getPrecioUnitario(),
                                         det.getNombreProducto(),
-                                        det.getProducto().getId()
+                                        det.getProductoId()
                                 ))
                                 .toList()
                 ))
