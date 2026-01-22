@@ -33,7 +33,7 @@ public class CompraController {
      * @return Page con compras, información de paginación
      */
     @GetMapping
-    public Page<CompraModel> getAllCompras(
+    public Page<CompraResponse> getAllCompras(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         // Validar que page sea al menos 1
@@ -62,7 +62,7 @@ public class CompraController {
      * @return Page con compras filtradas
      */
     @GetMapping("/filtrar")
-    public Page<CompraModel> filtrarCompras(
+    public Page<CompraResponse> filtrarCompras(
             @RequestParam(required = false) String q,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {

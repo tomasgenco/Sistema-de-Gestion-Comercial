@@ -83,6 +83,9 @@ public class VentaService {
             List.of() : 
             ventaRepository.findByIdInWithDetallesAndProductos(ventaIds);
         
+        // Ordenar por fecha descendente (más reciente primero)
+        ventasConProductos.sort((v1, v2) -> v2.getFechaHora().compareTo(v1.getFechaHora()));
+        
         // Convertir a DTO
         List<VentaResponse> ventasResponse = ventasConProductos.stream()
             .map(venta -> new VentaResponse(
@@ -96,7 +99,8 @@ public class VentaService {
                         detalle.getCantidad(),
                         detalle.getPrecioUnitario(),
                         detalle.getNombreProducto(),
-                        detalle.getProductoId()
+                        detalle.getProducto() != null ? detalle.getProducto().getId() : null,
+                        detalle.getProducto() != null ? detalle.getProducto().getTipoVenta() : detalle.getTipoVenta()
                     ))
                     .toList()
             ))
@@ -179,7 +183,8 @@ public class VentaService {
                             detalle.getCantidad(),
                             detalle.getPrecioUnitario(),
                             detalle.getNombreProducto(),
-                            detalle.getProductoId()
+                            detalle.getProducto() != null ? detalle.getProducto().getId() : null,
+                            detalle.getProducto() != null ? detalle.getProducto().getTipoVenta() : detalle.getTipoVenta()
                         ))
                         .toList()
                 ))
@@ -223,6 +228,7 @@ public VentaModel registrarVenta(List<ItemVentaRequest> items, MetodoPago metodo
         detalle.setCantidad(item.cantidad());
         detalle.setPrecioUnitario(item.precioUnitario());
         detalle.setNombreProducto(producto.getNombre()); // Snapshot
+        detalle.setTipoVenta(producto.getTipoVenta()); // Snapshot
         detalle.setVenta(venta); // FK a la venta
         detalles.add(detalle);
         

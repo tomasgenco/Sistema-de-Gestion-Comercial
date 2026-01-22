@@ -2,11 +2,14 @@ package com.ApiRestStock.CRUD.ventas;
 
 import java.math.BigDecimal;
 
+import com.ApiRestStock.CRUD.stock.Enums.TipoVenta;
 import com.ApiRestStock.CRUD.stock.ProductModel;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,6 +46,10 @@ public class DetalleVentaModel {
     @Column(name = "nombre_producto", nullable = false, length = 255)
     private String nombreProducto;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_venta", nullable = false, length = 20)
+    private TipoVenta tipoVenta;
+
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "venta_id", nullable = false)
@@ -51,9 +58,6 @@ public class DetalleVentaModel {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id", nullable = false)
     private ProductModel producto;
-
-    @Column(name = "producto_id", nullable = false, insertable = false, updatable = false)
-    private Long productoId;
 
     public Long getId() {
         return id;
@@ -101,8 +105,12 @@ public class DetalleVentaModel {
         this.nombreProducto = nombreProducto;
     }
 
-    public Long getProductoId() {
-        return productoId;
+    public TipoVenta getTipoVenta() {
+        return tipoVenta;
+    }
+
+    public void setTipoVenta(TipoVenta tipoVenta) {
+        this.tipoVenta = tipoVenta;
     }
 
 }

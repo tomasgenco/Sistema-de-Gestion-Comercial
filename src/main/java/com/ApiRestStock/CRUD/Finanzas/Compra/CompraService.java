@@ -51,9 +51,28 @@ public class CompraService {
      * @param size tamaño de página
      * @return Page con compras e información de paginación
      */
-    public Page<CompraModel> getComprasPaginadas(int page, int size) {
+    public Page<CompraResponse> getComprasPaginadas(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("fechaHora").descending());
-        return compraRepository.findAll(pageable);
+        Page<CompraModel> comprasPage = compraRepository.findAll(pageable);
+        
+        // Convertir a DTO
+        return comprasPage.map(compra -> new CompraResponse(
+            compra.getId(),
+            compra.getFechaHora(),
+            compra.getMetodoPago().name(),
+            compra.getProveedor().getNombreEmpresa(),
+            compra.getTotal(),
+            compra.getDetalles().stream()
+                .map(det -> new DetalleCompraResponse(
+                    det.getId(),
+                    det.getCantidad(),
+                    det.getPrecioUnitario(),
+                    det.getNombreProducto(),
+                    det.getProducto().getId(),
+                    det.getProducto().getTipoVenta()
+                ))
+                .toList()
+        ));
     }
 
     /**
@@ -63,10 +82,29 @@ public class CompraService {
      * @param size tamaño de página
      * @return Page con compras filtradas
      */
-    public Page<CompraModel> filtrarCompras(String searchTerm, int page, int size) {
+    public Page<CompraResponse> filtrarCompras(String searchTerm, int page, int size) {
         // Como la query ya tiene ORDER BY, usamos Pageable sin Sort
         Pageable pageable = PageRequest.of(page, size);
-        return compraRepository.filtrarCompras(searchTerm, pageable);
+        Page<CompraModel> comprasPage = compraRepository.filtrarCompras(searchTerm, pageable);
+        
+        // Convertir a DTO
+        return comprasPage.map(compra -> new CompraResponse(
+            compra.getId(),
+            compra.getFechaHora(),
+            compra.getMetodoPago().name(),
+            compra.getProveedor().getNombreEmpresa(),
+            compra.getTotal(),
+            compra.getDetalles().stream()
+                .map(det -> new DetalleCompraResponse(
+                    det.getId(),
+                    det.getCantidad(),
+                    det.getPrecioUnitario(),
+                    det.getNombreProducto(),
+                    det.getProducto() != null ? det.getProducto().getId() : null,
+                    det.getProducto() != null ? det.getProducto().getTipoVenta() : det.getTipoVenta()
+                ))
+                .toList()
+        ));
     }
 
 
@@ -111,6 +149,7 @@ public class CompraService {
             detalle.setCantidad(item.cantidad());
             detalle.setPrecioUnitario(item.precioUnitario());
             detalle.setNombreProducto(item.nombreProducto());
+            detalle.setTipoVenta(producto.getTipoVenta()); // Snapshot
             detalle.setProducto(producto);
             detalle.setCompra(compraModel);
             compraModel.getDetalles().add(detalle);
@@ -157,6 +196,7 @@ public class CompraService {
             detalle.setCantidad(item.cantidad());
             detalle.setPrecioUnitario(item.precioUnitario());
             detalle.setNombreProducto(item.nombreProducto());
+            detalle.setTipoVenta(producto.getTipoVenta()); // Snapshot
             detalle.setProducto(producto); // Vincular el producto al detalle
             detalle.setCompra(compraModel);
             compraModel.getDetalles().add(detalle);
@@ -198,7 +238,8 @@ public class CompraService {
                                         det.getCantidad(),
                                         det.getPrecioUnitario(),
                                         det.getNombreProducto(),
-                                        det.getProductoId()
+                                        det.getProducto() != null ? det.getProducto().getId() : null,
+                                        det.getProducto() != null ? det.getProducto().getTipoVenta() : det.getTipoVenta()
                                 ))
                                 .toList()
                 ))

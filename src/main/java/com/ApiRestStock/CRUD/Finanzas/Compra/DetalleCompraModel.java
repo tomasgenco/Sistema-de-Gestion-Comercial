@@ -2,11 +2,14 @@ package com.ApiRestStock.CRUD.Finanzas.Compra;
 
 import java.math.BigDecimal;
 
+import com.ApiRestStock.CRUD.stock.Enums.TipoVenta;
 import com.ApiRestStock.CRUD.stock.ProductModel;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -41,9 +44,6 @@ public class DetalleCompraModel {
     @JoinColumn(name = "producto_id", nullable = false)
     private ProductModel producto;
 
-    @Column(name = "producto_id", nullable = false, insertable = false, updatable = false)
-    private Long productoId;
-
     @Column(nullable = false, precision = 10, scale = 3)
     private BigDecimal cantidad;
 
@@ -53,6 +53,10 @@ public class DetalleCompraModel {
     // SNAPSHOT
     @Column(name = "nombre_producto", nullable = false, length = 255)
     private String nombreProducto;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_venta", nullable = false, length = 20)
+    private TipoVenta tipoVenta;
 
     // --- getters/setters ---
 
@@ -100,7 +104,11 @@ public class DetalleCompraModel {
         this.nombreProducto = nombreProducto;
     }
 
-    public Long getProductoId() {
-        return productoId;
+    public TipoVenta getTipoVenta() {
+        return tipoVenta;
+    }
+
+    public void setTipoVenta(TipoVenta tipoVenta) {
+        this.tipoVenta = tipoVenta;
     }
 }
