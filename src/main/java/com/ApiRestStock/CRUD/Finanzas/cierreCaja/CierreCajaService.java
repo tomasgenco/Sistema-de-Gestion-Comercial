@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +92,11 @@ public class CierreCajaService {
         return value == null ? BigDecimal.ZERO : value;
     }
 
+    @Transactional(readOnly = true)
+    public List<CierreCajaModel> obtenerPorRangoFechas(LocalDate desde, LocalDate hasta) {
+        return cierreCajaRepository.findByFechaBetweenOrderByFechaAsc(desde, hasta);
+    }
+
     @Transactional()
     public Optional<CierreCajaModel> obtenerPorFecha(LocalDate fecha) {
 
@@ -105,9 +112,22 @@ public class CierreCajaService {
 
     
 
+    /**
+     * Lista los cierres de caja de un mes específico, paginados y ordenados por fecha descendente
+     * @param mes Mes (1-12)
+     * @param año Año
+     * @param page Número de página (base 0)
+     * @param size Tamaño de página
+     * @return Page con cierres de caja del mes
+     */
     @Transactional(readOnly = true)
-    public Page<CierreCajaResponse> listar(Pageable pageable) {
-        return cierreCajaRepository.findAll(pageable)
+    public Page<CierreCajaResponse> listarPorMes(int mes, int año, int page, int size) {
+        // Calcular primer y último día del mes
+        LocalDate primerDia = LocalDate.of(año, mes, 1);
+        LocalDate ultimoDia = primerDia.withDayOfMonth(primerDia.lengthOfMonth());
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("fecha").descending());
+        return cierreCajaRepository.findByFechaBetween(primerDia, ultimoDia, pageable)
                 .map(this::toResponse);
     }
 

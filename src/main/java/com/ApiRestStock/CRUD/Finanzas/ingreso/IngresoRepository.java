@@ -25,11 +25,11 @@ public interface IngresoRepository extends JpaRepository<IngresoModel, Long>{
 
     // Sumar el total de ingresos (todos)
     @Query("SELECT COALESCE(SUM(i.total), 0) FROM IngresoModel i")
-    Double sumTotalIngresos();
+    BigDecimal sumTotalIngresos();
 
     // Sumar el total de ingresos entre dos instantes (por ejemplo, para los últimos N días)
     @Query("SELECT COALESCE(SUM(i.total), 0) FROM IngresoModel i WHERE i.fecha BETWEEN :desde AND :hasta")
-    Double sumTotalIngresosBetween(OffsetDateTime desde, OffsetDateTime hasta);
+    BigDecimal sumTotalIngresosBetween(OffsetDateTime desde, OffsetDateTime hasta);
 
     // Sumar ingresos del día específico
     @Query("SELECT COALESCE(SUM(i.total), 0) FROM IngresoModel i WHERE CAST(i.fecha AS date) = :fecha")

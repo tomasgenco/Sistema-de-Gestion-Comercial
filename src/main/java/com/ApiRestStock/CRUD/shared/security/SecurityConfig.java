@@ -54,6 +54,10 @@ public class SecurityConfig {
                 // VENDEDOR + ADMIN: búsqueda de productos
                 .requestMatchers(HttpMethod.GET, "/producto/search").hasAnyRole("ADMIN", "VENDEDOR")
 
+                // ADMIN: cierres de caja y mes
+                .requestMatchers("/cierre-caja/**").hasRole("ADMIN")
+                .requestMatchers("/cierre-mes/**").hasRole("ADMIN")
+
                 // Todo lo demás: solo ADMIN
                 .anyRequest().hasRole("ADMIN")
             )

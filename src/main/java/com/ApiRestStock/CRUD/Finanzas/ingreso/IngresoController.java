@@ -1,5 +1,6 @@
 package com.ApiRestStock.CRUD.Finanzas.ingreso;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class IngresoController {
     }
 
     @GetMapping("/total")
-    public double getTotalIngresos(@RequestParam(name = "dias", required = false) Integer dias) {
+    public BigDecimal getTotalIngresos(@RequestParam(name = "dias", required = false) Integer dias) {
         if (dias == null) {
             return ingresoService.getTotalIngresos();
         }

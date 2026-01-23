@@ -46,18 +46,27 @@ public class IngresoService {
         return ingresoRepository.findByTipo(tipo);
     }
 
-    public double getTotalIngresos() {
-        Double total = ingresoRepository.sumTotalIngresos();
-        return total != null ? total : 0.0;
+    public BigDecimal getTotalIngresosByFechaBetween(LocalDate desde, LocalDate hasta) {
+        // Convertir LocalDate a OffsetDateTime con zona horaria de Argentina
+        OffsetDateTime desdeDateTime = desde.atStartOfDay(ZoneId.of("America/Argentina/Buenos_Aires")).toOffsetDateTime();
+        OffsetDateTime hastaDateTime = hasta.atTime(23, 59, 59).atZone(ZoneId.of("America/Argentina/Buenos_Aires")).toOffsetDateTime();
+        
+        BigDecimal total = ingresoRepository.sumTotalIngresosBetween(desdeDateTime, hastaDateTime);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
-    public double getTotalIngresosLastDays(int dias) {
+    public BigDecimal getTotalIngresos() {
+        BigDecimal total = ingresoRepository.sumTotalIngresos();
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    public BigDecimal getTotalIngresosLastDays(int dias) {
         OffsetDateTime hasta = OffsetDateTime.now(ZoneId.of("America/Argentina/Buenos_Aires"));
         OffsetDateTime desde = hasta.minusDays(dias);
         OffsetDateTime desde00 = desde.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        Double total = ingresoRepository.sumTotalIngresosBetween(desde00, hasta);
-        return total != null ? total : 0.0;
+        BigDecimal total = ingresoRepository.sumTotalIngresosBetween(desde00, hasta);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     /**

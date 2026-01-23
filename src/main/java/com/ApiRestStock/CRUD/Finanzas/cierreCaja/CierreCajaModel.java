@@ -3,13 +3,17 @@ package com.ApiRestStock.CRUD.Finanzas.cierreCaja;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.ApiRestStock.CRUD.Finanzas.cierreMes.CierreMesModel;
 import com.ApiRestStock.CRUD.ventas.enums.MetodoPago;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -64,6 +68,11 @@ public class CierreCajaModel {
     // Observaciones del cierre
     @Column(columnDefinition = "TEXT")
     private String observaciones;
+
+    // Relación con CierreMes (un cierre diario puede pertenecer a un cierre mensual)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cierre_mes_id")
+    private CierreMesModel cierreMes;
 
     /* ======================
        Getters & Setters
@@ -202,6 +211,18 @@ public class CierreCajaModel {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    public CierreMesModel getCierreMes() {
+        return cierreMes;
+    }
+
+    public void setCierreMes(CierreMesModel cierreMes) {
+        this.cierreMes = cierreMes;
+    }
+
+    public BigDecimal getTotalMercadoPago() {
+        return totalMercadoPago;
     }
 
 }
