@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ApiRestStock.CRUD.Finanzas.DTOs.ProductosFaltantesResponse;
 import com.ApiRestStock.CRUD.Finanzas.exception.CierreCajaDuplicadoException;
+import com.ApiRestStock.CRUD.Finanzas.exception.CierreMesDuplicadoException;
 import com.ApiRestStock.CRUD.Finanzas.exception.NoFoundComprasProveedorException;
 import com.ApiRestStock.CRUD.Finanzas.exception.ProductosFaltantesException;
 import com.ApiRestStock.CRUD.shared.dto.error.ApiError;
@@ -20,8 +21,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleCierreCajaDuplicado(CierreCajaDuplicadoException ex) {
 
         ApiError apiError = new ApiError(
-            HttpStatus.CONFLICT.value(), // código HTTP 404
+            HttpStatus.CONFLICT.value(), // código HTTP 409
             "CIERRE_CAJA_DUPLICADO",
+            ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+    }
+
+    @ExceptionHandler(CierreMesDuplicadoException.class)
+    public ResponseEntity<ApiError> handleCierreMesDuplicado(CierreMesDuplicadoException ex) {
+
+        ApiError apiError = new ApiError(
+            HttpStatus.CONFLICT.value(), // código HTTP 409
+            "CIERRE_MES_DUPLICADO",
             ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
@@ -52,6 +64,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(error);
+    }
+
+    // Handler genérico para RuntimeException (para debug)
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiError> handleRuntimeException(RuntimeException ex) {
+        ApiError error = new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            "INTERNAL_ERROR",
+            ex.getMessage()
+        );
+        
+        // Log para debug
+        System.err.println("RuntimeException no manejada: " + ex.getClass().getName() + " - " + ex.getMessage());
+        ex.printStackTrace();
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
 }
