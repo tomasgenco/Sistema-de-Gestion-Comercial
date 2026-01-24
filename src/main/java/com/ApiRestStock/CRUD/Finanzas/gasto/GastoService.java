@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ApiRestStock.CRUD.Finanzas.Compra.CompraModel;
 import com.ApiRestStock.CRUD.Finanzas.enums.TipoGasto;
 
 @Service
@@ -28,6 +29,22 @@ public class GastoService {
         gastoModel.setNombreProveedor(nombreProveedor);
 
         
+        
+        GastoModel savedGasto = gastoRepository.save(gastoModel);
+        return Optional.of(savedGasto);
+    }
+
+    /**
+     * Registra un gasto vinculado a una compra (para gastos de tipo PROVEEDOR)
+     */
+    @Transactional
+    public Optional<GastoModel> registrarGastoDeCompra(CompraModel compra) {
+        GastoModel gastoModel = new GastoModel();
+        gastoModel.setFecha(compra.getFechaHora());
+        gastoModel.setTotal(compra.getTotal());
+        gastoModel.setTipo(TipoGasto.PROVEEDOR);
+        gastoModel.setNombreProveedor(compra.getProveedor().getNombreEmpresa());
+        gastoModel.setCompra(compra);
         
         GastoModel savedGasto = gastoRepository.save(gastoModel);
         return Optional.of(savedGasto);

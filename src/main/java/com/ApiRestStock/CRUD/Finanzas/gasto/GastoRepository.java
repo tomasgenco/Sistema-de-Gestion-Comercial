@@ -32,10 +32,11 @@ public interface GastoRepository extends JpaRepository<GastoModel, Long> {
     java.math.BigDecimal sumGastosDelDia(LocalDate fecha);
 
     // Sumar gastos en EFECTIVO del día (desde compras con método EFECTIVO)
+    // Usa INNER JOIN porque solo nos interesan gastos que tienen compra vinculada
     @Query("""
         SELECT COALESCE(SUM(g.total), 0)
         FROM GastoModel g
-        JOIN g.compra c
+        INNER JOIN g.compra c
         WHERE CAST(g.fecha AS date) = :fecha
         AND c.metodoPago = com.ApiRestStock.CRUD.ventas.enums.MetodoPago.EFECTIVO
     """)

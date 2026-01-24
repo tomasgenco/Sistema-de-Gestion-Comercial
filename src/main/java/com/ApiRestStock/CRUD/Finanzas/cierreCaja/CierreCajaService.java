@@ -39,7 +39,8 @@ public class CierreCajaService {
      * Cierra la caja para una fecha (normalmente hoy).
      * - Si ya existe cierre para esa fecha, lanza excepción.
      * - Calcula totales del día por método de pago desde ventas.
-     * - Registra efectivo_real y diferencia (real - teorico_efectivo).
+     * - Calcula efectivo en sistema: ingresos efectivo - gastos efectivo (incluyendo compras a proveedores).
+     * - Registra efectivo_real y diferencia (real - efectivo_en_sistema).
      */
     @Transactional
     public CierreCajaModel cerrarCaja(LocalDate fecha, BigDecimal efectivoReal, String observaciones) {
@@ -69,12 +70,17 @@ public class CierreCajaService {
                 .add(totalTarjetaCredito)
                 .add(totalTarjetaDebito);
 
-        BigDecimal diferencia = efectivoReal.subtract(totalEfectivo);
+        // Efectivo en sistema = ingresos efectivo - gastos efectivo
+        BigDecimal ingresosEfectivo = nz(ingresoRepository.sumIngresosEfectivoDelDia(fecha));
+        BigDecimal gastosEfectivo = nz(gastoRepository.sumGastosEfectivoDelDia(fecha));
+        BigDecimal efectivoEnSistema = ingresosEfectivo.subtract(gastosEfectivo);
+
+        BigDecimal diferencia = efectivoReal.subtract(efectivoEnSistema);
 
         // Armar entidad
         CierreCajaModel cierre = new CierreCajaModel();
         cierre.setFecha(fecha);
-        cierre.setTotalEfectivo(totalEfectivo);
+        cierre.setTotalEfectivo(efectivoEnSistema); // Efectivo en sistema (ingresos - gastos)
         cierre.setTotalPorMetodoPago(MetodoPago.MERCADO_PAGO, totalMercadoPago);
         cierre.setTotalPorMetodoPago(MetodoPago.CUENTA_DNI, totalCuentaDni);
         cierre.setTotalPorMetodoPago(MetodoPago.TARJETA_CREDITO, totalTarjetaCredito);
@@ -188,7 +194,10 @@ public class CierreCajaService {
         // Efectivo en sistema = ingresos efectivo - gastos efectivo
         BigDecimal ingresosEfectivo = nz(ingresoRepository.sumIngresosEfectivoDelDia(fecha));
         BigDecimal gastosEfectivo = nz(gastoRepository.sumGastosEfectivoDelDia(fecha));
+        System.out.println("Ingresos Efectivo: " + ingresosEfectivo);
+        System.out.println("Gastos Efectivo: " + gastosEfectivo);
         BigDecimal efectivoEnSistema = ingresosEfectivo.subtract(gastosEfectivo);
+        System.out.println("Efectivo en Sistema: " + efectivoEnSistema);
 
         // Armar response
         CierreCajaResponse response = new CierreCajaResponse();

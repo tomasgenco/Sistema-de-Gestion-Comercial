@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ApiRestStock.CRUD.Finanzas.Compra.DTOs.CompraResponse;
 import com.ApiRestStock.CRUD.Finanzas.Compra.DTOs.DetalleCompraResponse;
-import com.ApiRestStock.CRUD.Finanzas.enums.TipoGasto;
 import com.ApiRestStock.CRUD.Finanzas.exception.NoFoundComprasProveedorException;
 import com.ApiRestStock.CRUD.Finanzas.gasto.GastoService;
 import com.ApiRestStock.CRUD.Finanzas.ingreso.DTOs.ItemCompraRequest;
@@ -159,16 +158,19 @@ public class CompraService {
         total = sumarTotal(compraModel.getDetalles());
         compraModel.setTotal(total);
 
-        //Registra la compra como un gasto en el sistema financiero
-        gastoService.registrarGasto(total, TipoGasto.PROVEEDOR, nombreProveedor);
-
         // Actualizar totalCompras y ultimaCompra del proveedor
         var proveedor = compraModel.getProveedor();
         proveedor.setTotalCompras(proveedor.getTotalCompras().add(total));
         proveedor.setUltimaCompra(compraModel.getFechaHora().toLocalDate());
         proveedorService.guardarProveedor(proveedor);
 
-        return compraRepository.save(compraModel);
+        // Primero guardar la compra para obtener el ID
+        CompraModel savedCompra = compraRepository.save(compraModel);
+
+        // Luego registrar la compra como un gasto vinculado
+        gastoService.registrarGastoDeCompra(savedCompra);
+
+        return savedCompra;
     }
 
     @Transactional
@@ -206,15 +208,18 @@ public class CompraService {
         total = sumarTotal(compraModel.getDetalles());
         compraModel.setTotal(total);
 
-        //Registra la compra como un gasto en el sistema financiero
-        gastoService.registrarGasto(total, TipoGasto.PROVEEDOR, proveedor.getNombreEmpresa());
-
         // Actualizar totalCompras y ultimaCompra del proveedor
         proveedor.setTotalCompras(proveedor.getTotalCompras().add(total));
         proveedor.setUltimaCompra(compraModel.getFechaHora().toLocalDate());
         proveedorService.guardarProveedor(proveedor);
 
-        return compraRepository.save(compraModel);
+        // Primero guardar la compra para obtener el ID
+        CompraModel savedCompra = compraRepository.save(compraModel);
+
+        // Luego registrar la compra como un gasto vinculado
+        gastoService.registrarGastoDeCompra(savedCompra);
+
+        return savedCompra;
     }
 
     public List<CompraResponse> getComprasPorEmpresa(String nombreEmpresa) {
