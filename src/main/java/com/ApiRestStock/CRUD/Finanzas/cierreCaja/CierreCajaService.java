@@ -185,20 +185,17 @@ public class CierreCajaService {
         BigDecimal totalTarjetaCredito = nz(ventaRepository.sumTotalByFechaAndMetodoPago(fecha, MetodoPago.TARJETA_CREDITO));
         BigDecimal totalTarjetaDebito = nz(ventaRepository.sumTotalByFechaAndMetodoPago(fecha, MetodoPago.TARJETA_DEBITO));
 
-        BigDecimal totalVentas = totalEfectivo
+        
+        // Efectivo en sistema = ingresos efectivo - gastos efectivo
+        BigDecimal ingresosEfectivo = nz(ingresoRepository.sumIngresosEfectivoDelDia(fecha));
+        BigDecimal gastosEfectivo = nz(gastoRepository.sumGastosEfectivoDelDia(fecha));
+        BigDecimal efectivoEnSistema = ingresosEfectivo.subtract(gastosEfectivo);
+        
+        BigDecimal totalVentas = efectivoEnSistema
                 .add(totalMercadoPago)
                 .add(totalCuentaDni)
                 .add(totalTarjetaCredito)
                 .add(totalTarjetaDebito);
-
-        // Efectivo en sistema = ingresos efectivo - gastos efectivo
-        BigDecimal ingresosEfectivo = nz(ingresoRepository.sumIngresosEfectivoDelDia(fecha));
-        BigDecimal gastosEfectivo = nz(gastoRepository.sumGastosEfectivoDelDia(fecha));
-        System.out.println("Ingresos Efectivo: " + ingresosEfectivo);
-        System.out.println("Gastos Efectivo: " + gastosEfectivo);
-        BigDecimal efectivoEnSistema = ingresosEfectivo.subtract(gastosEfectivo);
-        System.out.println("Efectivo en Sistema: " + efectivoEnSistema);
-
         // Armar response
         CierreCajaResponse response = new CierreCajaResponse();
         response.setFecha(fecha);
